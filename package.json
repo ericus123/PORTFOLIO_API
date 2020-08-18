@@ -1,0 +1,27 @@
+{
+  "name": "node-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "bcryptjs": "^2.4.3",
+    "config": "^3.3.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.19",
+    "mongoose": "^5.10.0",
+    "nodemon": "^2.0.4",
+    "path": "^0.12.7",
+    "stream": "^0.0.2"
+  },
+  "scripts": {
+    "start": " nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
