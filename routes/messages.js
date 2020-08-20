@@ -45,7 +45,7 @@ router.delete("/delete/:id", verify, async (req, res) => {
     res.send("Message deleted successfully !");
   } catch {
     res.status(404);
-    res.send({ error: "Ooops!!!! Message doesn't exist!" });
+    res.send({ error: "Not found message with id=" + req.params.id });
   }
 });
 module.exports = router;
