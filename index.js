@@ -11,7 +11,7 @@ dotenv.config();
 
 const authRoute = require("./routes/auth");
 const postRoute = require("./routes/posts");
-const createpostRoute = require("./routes/createPost");
+const messageRoute = require("./routes/messages");
 
 //connect to db
 mongoose.connect(
@@ -27,7 +27,7 @@ app.use(express.json());
 
 app.use("/api/user", authRoute);
 app.use("/api/posts", postRoute);
-app.use("/api/createPost", createpostRoute);
+app.use("/api/messages", messageRoute);
 
 //Listen for requests
 
