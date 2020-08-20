@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const Post = require("../model/Post");
 const verify = require("./verifyToken");
 
-const { postValidation } = require("../validation");
+const { postValidation, editpostValidation } = require("../validation");
+const { findOne } = require("../model/Post");
 router.post("/create", verify, async (req, res) => {
   //VALIDATE THE DATA BEFORE CREATING  A POST
   const { error } = postValidation(req.body);
@@ -25,7 +26,7 @@ router.post("/create", verify, async (req, res) => {
 
 //Get posts form db
 
-router.get("/", function (req, res) {
+router.get("/get", verify, function (req, res) {
   Post.find({}, function (err, result) {
     if (err) {
       res.send(err);
@@ -34,10 +35,26 @@ router.get("/", function (req, res) {
     }
   });
 });
+//Get a single post form db
+router.get("/getsinglepost/:id", verify, async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const singlepost = await Post.findOne({ _id: id });
+    res.send(singlepost);
+  } catch {
+    res
+      .status(404)
+      .send({ message: "Error retrieving Tutorial with id=" + id });
+  }
+});
 
 //Edit post
 
-router.put("/:id", verify, async (req, res) => {
+router.put("/update/:id", verify, async (req, res) => {
+  const { error } = editpostValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+  const id = req.params.id;
   try {
     const post = await Post.findOne({ _id: req.params.id });
 
@@ -57,7 +74,7 @@ router.put("/:id", verify, async (req, res) => {
 
 //Delete  post
 
-router.delete("/:id", verify, async (req, res) => {
+router.delete("/delete/:id", verify, async (req, res) => {
   try {
     const post = await Post.findOne({ _id: req.params.id });
 
