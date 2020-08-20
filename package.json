@@ -20,8 +20,12 @@
     "stream": "^0.0.2"
   },
   "scripts": {
-    "start": " nodemon index.js"
+    "start": " nodemon index.js",
+    "test": "jest"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^26.4.0"
+  }
 }
