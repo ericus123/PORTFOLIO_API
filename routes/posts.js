@@ -1,88 +1,31 @@
 const router = require("express").Router();
-const mongoose = require("mongoose");
 const Post = require("../model/Post");
-const verify = require("./verifyToken");
+const verify = require("../middleware/verifyToken");
 
-const { postValidation, editpostValidation } = require("../validation");
-const { findOne } = require("../model/Post");
-router.post("/create", verify, async (req, res) => {
-  //VALIDATE THE DATA BEFORE CREATING  A POST
-  const { error } = postValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+const {
+  postValidation,
+  editpostValidation,
+} = require("../middleware/validation");
+const {
+  createpostController,
+  getallpostsController,
+  getsinglepostController,
+  updatepostController,
+  deletepostController,
+} = require("../controller/posts");
+router.post("/create", verify, postValidation, createpostController);
 
-  //Create a new Post
-  const post = new Post({
-    title: req.body.title,
-    description: req.body.description,
-    author: req.body.author,
-  });
-  try {
-    const savedPost = await post.save();
-    res.send(savedPost);
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
+//Get all posts form db
 
-//Get posts form db
-
-router.get("/get", verify, function (req, res) {
-  Post.find({}, function (err, result) {
-    if (err) {
-      res.send(err);
-    } else {
-      res.send(result);
-    }
-  });
-});
+router.get("/getall", getallpostsController);
 //Get a single post form db
-router.get("/getsinglepost/:id", verify, async (req, res) => {
-  const id = req.params.id;
-
-  try {
-    const singlepost = await Post.findOne({ _id: id });
-    res.send(singlepost);
-  } catch {
-    res
-      .status(404)
-      .send({ message: "Error retrieving Tutorial with id=" + id });
-  }
-});
+router.get("/getsingle/:id", getsinglepostController);
 
 //Edit post
 
-router.put("/update/:id", verify, async (req, res) => {
-  const { error } = editpostValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-  const id = req.params.id;
-  try {
-    const post = await Post.findOne({ _id: req.params.id });
-
-    if (req.body.title) {
-      post.title = req.body.title;
-    }
-    if (req.body.description) {
-      post.content = req.body.content;
-    }
-    await post.save();
-    res.send(post);
-  } catch {
-    res.status(404);
-    res.send({ error: "Ooops!!!! Post doesn't exist!" });
-  }
-});
+router.put("/update/:id", verify, editpostValidation, updatepostController);
 
 //Delete  post
 
-router.delete("/delete/:id", verify, async (req, res) => {
-  try {
-    const post = await Post.findOne({ _id: req.params.id });
-
-    await post.deleteOne();
-    res.send("Post deleted successfully !");
-  } catch {
-    res.status(404);
-    res.send({ error: "Ooops!!!! Post doesn't exist!" });
-  }
-});
+router.delete("/delete/:id", verify, deletepostController);
 module.exports = router;
