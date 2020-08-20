@@ -34,6 +34,16 @@ const postValidation = (data) => {
   return schema.validate(data);
 };
 
+// edit post validation
+
+const editpostValidation = (data) => {
+  const schema = Joi.object({
+    title: Joi.string().min(15).required(),
+    description: Joi.string().min(500).required(),
+  });
+  return schema.validate(data);
+};
+
 //Message validation
 const messageValidation = (data) => {
   const schema = Joi.object({
@@ -44,7 +54,9 @@ const messageValidation = (data) => {
   });
   return schema.validate(data);
 };
+
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.postValidation = postValidation;
 module.exports.messageValidation = messageValidation;
+module.exports.editpostValidation = editpostValidation;
