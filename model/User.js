@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { string } = require("@hapi/joi");
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -16,6 +17,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     max: 1024,
     min: 6,
+  },
+  bio: {
+    type: String,
+    required: true,
+    min: 15,
   },
   date: {
     type: Date,
