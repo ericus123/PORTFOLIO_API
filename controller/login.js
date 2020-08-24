@@ -18,7 +18,9 @@ const loginController = async (req, res) => {
   );
   res.header("auth-token", token);
 
-  res.send("Welcome " + user.name + "!" + "  You are now logged in");
+  res.send({
+    success: "Welcome " + user.name + "!" + "  You are now logged in",
+  });
 };
 
 module.exports = loginController;

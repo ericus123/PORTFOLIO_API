@@ -10,10 +10,9 @@ const updateuserController = async (req, res, next) => {
   //Check if a user email is already in the database
   const emailExists = await User.findOne({ email: req.body.email });
   if (emailExists) return res.status(400).send("Email already exists");
+  const user = await User.findOne({ _id: id });
 
   try {
-    const user = await User.findOne({ _id: id });
-
     if (req.body.name) {
       user.name = req.body.name;
     }
