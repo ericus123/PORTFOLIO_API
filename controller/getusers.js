@@ -4,7 +4,8 @@ const getusersController = async (req, res, next) => {
     if (err) {
       res.send(err);
     } else {
-      res.send(result);
+      const users = result;
+      res.send(users);
     }
   });
 };
