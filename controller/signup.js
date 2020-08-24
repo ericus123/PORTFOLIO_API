@@ -3,7 +3,8 @@ const bcrypt = require("bcryptjs");
 const signupController = async (req, res) => {
   //Check if a user is already in the database
   const emailExists = await User.findOne({ email: req.body.email });
-  if (emailExists) return res.status(400).send("Email already exists");
+  if (emailExists)
+    return res.status(400).send({ error: "Email already exists" });
 
   //Hash the passwords
   const salt = await bcrypt.genSalt(10);

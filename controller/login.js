@@ -8,7 +8,7 @@ const loginController = async (req, res) => {
 
   //password is correct
   const validPass = await bcrypt.compare(req.body.password, user.password);
-  if (!validPass) return res.status(400).send("Invalid password");
+  if (!validPass) return res.status(400).send({ error: "Invalid password" });
   //create and assign a token
   const token = jwt.sign(
     {
@@ -19,6 +19,7 @@ const loginController = async (req, res) => {
   res.header("auth-token", token);
 
   res.send({
+    token: token,
     success: "Welcome " + user.name + "!" + "  You are now logged in",
   });
 };

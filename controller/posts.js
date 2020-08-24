@@ -32,7 +32,7 @@ const getsinglepostController = async (req, res) => {
     const singlepost = await Post.findOne({ _id: id });
     res.send(singlepost);
   } catch {
-    res.status(404).send({ message: "Error retrieving post with id=" + id });
+    res.status(404).send({ error: "Error retrieving post with id=" + id });
   }
 };
 const updatepostController = async (req, res) => {
@@ -59,7 +59,7 @@ const deletepostController = async (req, res) => {
     const post = await Post.findOne({ _id: req.params.id });
 
     await post.deleteOne();
-    res.send("Post deleted successfully !");
+    res.send({ success: "Post deleted successfully !" });
   } catch {
     res.status(404);
     res.send({ error: "Ooops!!!! Post doesn't exist!" });
