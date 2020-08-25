@@ -2,40 +2,28 @@ const User = require("../model/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const updateuserController = async (req, res, next) => {
-  const id = req.params.id;
-  //Check if a  name is already in the database
-  const nameExists = await User.findOne({ name: req.body.name });
-  if (nameExists)
-    return res.status(400).send({ error: "Name already exists " });
+  const id = req.user._id;
 
   //Check if a user email is already in the database
-  const emailExists = await User.findOne({ email: req.body.email });
-  if (emailExists)
-    return res.status(400).send({ error: "Email already exists" });
-  const user = await User.findOne({ _id: id });
+  // const emailExists = await User.findOne({ email: req.body.email });
+  // if (emailExists)
+  // return res.status(400).send({ error: "Email already exists" });
+  // const user = await User.findOne({ id });
+  // //Hash the passwords
+  // const salt = await bcrypt.genSalt(10);
+  // const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
   try {
-    if (req.body.name) {
-      user.name = req.body.name;
-    }
-    if (req.body.email) {
-      user.email = req.body.email;
-    }
-    if (req.body.password) {
-      //Hash the passwords
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(req.body.password, salt);
-      user.password = hashedPassword;
-    }
-    if (req.body.bio) {
-      user.bio = req.body.bio;
-    }
-    await user.save();
-    res.send(user);
+    const updateduser = await User.updateOne(
+      { id },
+      { $set: { username: req.body.username, email: req.body.email } }
+    );
+
+    res.send(updateduser);
   } catch {
     res.status(404);
     res.send({
-      error: "Ooops!!!! User with id=" + id + " doesn't exist!",
+      error: "Ooops!!!! User with id doesn't exist!",
     });
   }
 };

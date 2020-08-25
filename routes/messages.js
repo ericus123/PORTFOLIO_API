@@ -1,20 +1,22 @@
-const router = require("express").Router();
-const Message = require("../model/Message");
-const { messageValidation } = require("../middleware/validation");
-const verify = require("../middleware/verifyToken");
-const {
+import { Router } from "express";
+import { messageValidation } from "../middleware/validation";
+import verify from "../middleware/verifyToken";
+
+import {
   messagesController,
   deletemsgController,
   getmessagesController,
-} = require("../controller/messages");
+} from "../controller/messages";
 
+const messageRoute = new Router();
 //create messages
-router.post("/create", messageValidation, messagesController);
+messageRoute.post("/create", messageValidation, messagesController);
 
 //Get messages form db
 
-router.get("/get", getmessagesController);
+messageRoute.get("/get", getmessagesController);
 //Delete a message
 
-router.delete("/delete/:id", verify, deletemsgController);
-module.exports = router;
+messageRoute.delete("/delete/:id", verify, deletemsgController);
+
+export default messageRoute;

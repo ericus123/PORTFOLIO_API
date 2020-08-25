@@ -1,4 +1,4 @@
-const User = require("../model/User");
+import User from "../model/User";
 const getusersController = async (req, res, next) => {
   User.find({}, function (err, result) {
     if (err) {
@@ -10,4 +10,4 @@ const getusersController = async (req, res, next) => {
   });
 };
 
-module.exports = getusersController;
+export default getusersController;

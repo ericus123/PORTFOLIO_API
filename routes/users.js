@@ -1,12 +1,13 @@
-const router = require("express").Router();
-const verify = require("../middleware/verifyToken");
-const User = require("../model/User");
+import { Router } from "express";
+import verify from "../middleware/verifyToken";
+const userRoute = new Router();
 
-const { updateUserValidation } = require("../middleware/validation");
-const updateuserController = require("../controller/updateUser");
-const getusersController = require("../controller/getusers");
+import { updateUserValidation } from "../middleware/validation";
+import updateuserController from "../controller/updateUser";
+import getusersController from "../controller/getusers";
 //get a list of all users
-router.get("/getusers", verify, getusersController);
+userRoute.get("/getusers", verify, getusersController);
 //update user info route
-router.put("/update/:id", verify, updateUserValidation, updateuserController);
-module.exports = router;
+userRoute.put("/update", verify, updateUserValidation, updateuserController);
+
+export default userRoute;

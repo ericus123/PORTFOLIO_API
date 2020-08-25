@@ -1,18 +1,15 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import userRoute from "./routes/users";
+import authRoute from "./routes/auth";
+import postRoute from "./routes/posts";
+import messageRoute from "./routes/messages";
 //express app
 
 const app = express();
 
 dotenv.config();
-
-//import routes
-
-const authRoute = require("./routes/auth");
-const userRoute = require("./routes/users");
-const postRoute = require("./routes/posts");
-const messageRoute = require("./routes/messages");
 
 //connect to db
 mongoose.connect(

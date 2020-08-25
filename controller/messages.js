@@ -1,5 +1,4 @@
-const verify = require("../middleware/verifyToken");
-const Message = require("../model/Message");
+import Message from "../model/Message";
 
 const messagesController = async (req, res) => {
   //Create a new message
@@ -38,6 +37,4 @@ const deletemsgController = async (req, res) => {
   }
 };
 
-module.exports.messagesController = messagesController;
-module.exports.deletemsgController = deletemsgController;
-module.exports.getmessagesController = getmessagesController;
+export { messagesController, deletemsgController, getmessagesController };

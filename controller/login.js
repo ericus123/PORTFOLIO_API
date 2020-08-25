@@ -1,6 +1,7 @@
-const User = require("../model/User");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+import User from "../model/User";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
 const loginController = async (req, res) => {
   //Check if email exists
   const user = await User.findOne({ email: req.body.email });
@@ -12,7 +13,7 @@ const loginController = async (req, res) => {
   //create and assign a token
   const token = jwt.sign(
     {
-      email: user.email,
+      id: user._id,
     },
     process.env.TOKEN_SECRET
   );
@@ -24,4 +25,4 @@ const loginController = async (req, res) => {
   });
 };
 
-module.exports = loginController;
+export default loginController;

@@ -1,31 +1,29 @@
-const router = require("express").Router();
-const Post = require("../model/Post");
-const verify = require("../middleware/verifyToken");
+import { Router } from "express";
+import verify from "../middleware/verifyToken";
 
-const {
-  postValidation,
-  editpostValidation,
-} = require("../middleware/validation");
-const {
+const postRoute = new Router();
+import { postValidation, editpostValidation } from "../middleware/validation";
+import {
   createpostController,
   getallpostsController,
   getsinglepostController,
   updatepostController,
   deletepostController,
-} = require("../controller/posts");
-router.post("/create", verify, postValidation, createpostController);
+} from "../controller/posts";
+
+postRoute.post("/create", verify, postValidation, createpostController);
 
 //Get all posts form db
 
-router.get("/getall", getallpostsController);
+postRoute.get("/getall", getallpostsController);
 //Get a single post form db
-router.get("/getsingle/:id", getsinglepostController);
+postRoute.get("/getsingle/:id", getsinglepostController);
 
 //Edit post
 
-router.put("/update/:id", verify, editpostValidation, updatepostController);
+postRoute.put("/update/:id", verify, editpostValidation, updatepostController);
 
 //Delete  post
 
-router.delete("/delete/:id", verify, deletepostController);
-module.exports = router;
+postRoute.delete("/delete/:id", verify, deletepostController);
+export default postRoute;

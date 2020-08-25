@@ -23,11 +23,14 @@
     "node": "10.19.0"
   },
   "scripts": {
-    "start": " nodemon index.js"
+    "start": " nodemon --exec babel-node  index.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.11.4",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.11.0",
     "jest": "^26.4.0"
   }
 }

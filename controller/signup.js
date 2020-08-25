@@ -1,5 +1,6 @@
-const User = require("../model/User");
-const bcrypt = require("bcryptjs");
+import User from "../model/User";
+import bcrypt from "bcryptjs";
+
 const signupController = async (req, res) => {
   //Check if a user is already in the database
   const emailExists = await User.findOne({ email: req.body.email });
@@ -25,4 +26,4 @@ const signupController = async (req, res) => {
   }
 };
 
-module.exports = signupController;
+export default signupController;

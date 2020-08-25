@@ -1,5 +1,4 @@
-const verify = require("../middleware/verifyToken");
-const Post = require("../model/Post");
+import Post from "../model/Post";
 const createpostController = async (req, res) => {
   //Create a new Post
   const post = new Post({
@@ -65,8 +64,11 @@ const deletepostController = async (req, res) => {
     res.send({ error: "Ooops!!!! Post doesn't exist!" });
   }
 };
-module.exports.createpostController = createpostController;
-module.exports.getallpostsController = getallpostsController;
-module.exports.getsinglepostController = getsinglepostController;
-module.exports.updatepostController = updatepostController;
-module.exports.deletepostController = deletepostController;
+
+export {
+  createpostController,
+  getallpostsController,
+  getsinglepostController,
+  updatepostController,
+  deletepostController,
+};
