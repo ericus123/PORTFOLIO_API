@@ -1,17 +1,17 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import userRoute from "./routes/users";
-import authRoute from "./routes/auth";
-import postRoute from "./routes/posts";
-import messageRoute from "./routes/messages";
+import userRoute from "./src/routes/users";
+import authRoute from "./src/routes/auth";
+import postRoute from "./src/routes/posts";
+import messageRoute from "./src/routes/messages";
 //express app
 
 const app = express();
 
 dotenv.config();
 
-//connect to db
+//connect to dba
 mongoose.connect(
   process.env.DB_CONNECT,
   { useNewUrlParser: true, useUnifiedTopology: true },
