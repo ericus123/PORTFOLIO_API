@@ -23,7 +23,8 @@
     "node": "10.19.0"
   },
   "scripts": {
-    "start": " nodemon --exec babel-node  index.js"
+    "start": " nodemon --exec babel-node  index.js",
+    "heroku-prebuild": "rm -rf node_modules"
   },
   "author": "",
   "license": "ISC",
@@ -31,6 +32,7 @@
     "@babel/core": "^7.11.4",
     "@babel/node": "^7.10.5",
     "@babel/preset-env": "^7.11.0",
+    "babel-preset-es2015": "^6.24.1",
     "jest": "^26.4.0"
   }
 }
