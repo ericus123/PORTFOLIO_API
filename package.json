@@ -23,8 +23,7 @@
     "node": "10.19.0"
   },
   "scripts": {
-    "start": " nodemon --exec babel-node  index.js",
-    "heroku-prebuild": "rm -rf node_modules"
+    "start": " nodemon --exec babel-node  index.js"
   },
   "author": "",
   "license": "ISC",
