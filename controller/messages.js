@@ -30,7 +30,7 @@ const deletemsgController = async (req, res) => {
     const message = await Message.findOne({ _id: req.params.id });
 
     await message.deleteOne();
-    res.send({ eror: "Message deleted successfully !" });
+    res.send({ error: "Message deleted successfully !" });
   } catch {
     res.status(404);
     res.send({ error: "Not found message with id=" + req.params.id });
