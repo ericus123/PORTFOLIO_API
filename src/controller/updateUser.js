@@ -1,6 +1,6 @@
 import User from "../model/User";
 import bcrypt from "bcryptjs";
-const updateuserController = async (req, res, next) => {
+const updateuserController = async (req, res) => {
   const id = req.user.id;
   //Check if a user email is already in the database
   const emailExists = await User.findOne({ email: req.body.email });
