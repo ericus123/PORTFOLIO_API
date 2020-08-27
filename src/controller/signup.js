@@ -13,7 +13,7 @@ const signupController = async (req, res) => {
 
   //Create a new User
   const user = new User({
-    username: req.body.name,
+    username: req.body.username,
     email: req.body.email,
     password: hashedPassword,
     bio: req.body.bio,
