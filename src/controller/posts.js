@@ -8,7 +8,7 @@ const createpostController = async (req, res) => {
   });
   try {
     const savedPost = await post.save();
-    res.send(savedPost);
+    res.send({ message: "Post created succesfully", article: savedPost });
   } catch (err) {
     res.status(400).send(err);
   }
@@ -46,7 +46,7 @@ const updatepostController = async (req, res) => {
       post.content = req.body.content;
     }
     await post.save();
-    res.send(post);
+    res.send({ message: "Post updated successfully", post: post });
   } catch {
     res.status(404);
     res.send({ error: "Ooops!!!! Post doesn't exist!" });
@@ -58,10 +58,10 @@ const deletepostController = async (req, res) => {
     const post = await Post.findOne({ _id: req.params.id });
 
     await post.deleteOne();
-    res.send({ success: "Post deleted successfully !" });
-  } catch {
+    res.send({ message: "Post deleted successfully !" });
+  } catch (error) {
     res.status(404);
-    res.send({ error: "Ooops!!!! Post doesn't exist!" });
+    res.send({ error: error });
   }
 };
 

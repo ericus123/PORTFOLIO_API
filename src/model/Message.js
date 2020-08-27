@@ -21,6 +21,10 @@ const messageSchema = new mongoose.Schema({
     min: 6,
     required: true,
   },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 export default mongoose.model("Message", messageSchema);
