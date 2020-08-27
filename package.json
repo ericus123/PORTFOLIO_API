@@ -1,8 +1,9 @@
 {
-  "name": "node-js",
+  "name": "brand-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "description": "This is an API for my brand website",
+  "type": "module",
+  "main": "index.js",
   "directories": {
     "doc": "docs"
   },
@@ -24,7 +25,7 @@
     "node": "10.19.0"
   },
   "scripts": {
-    "start": "nodemon -r esm index.js"
+    "start": "nodemon  --exec babel-node index.js"
   },
   "author": "",
   "license": "ISC",
