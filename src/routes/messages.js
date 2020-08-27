@@ -14,7 +14,7 @@ messageRoute.post("/create", messageValidation, messagesController);
 
 //Get messages form db
 
-messageRoute.get("/get", getmessagesController);
+messageRoute.get("/get", verify, getmessagesController);
 //Delete a message
 
 messageRoute.delete("/delete/:id", verify, deletemsgController);
