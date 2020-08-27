@@ -35,4 +35,4 @@ const updateuserController = async (req, res, next) => {
   }
 };
 
-module.exports = updateuserController;
+export default updateuserController;
