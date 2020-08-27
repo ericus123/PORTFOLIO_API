@@ -5,7 +5,7 @@ const getusersController = async (req, res, next) => {
       res.send(err);
     } else {
       const users = result;
-      res.send(users);
+      res.send({ users: result });
     }
   });
 };

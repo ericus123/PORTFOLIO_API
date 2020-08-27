@@ -26,7 +26,12 @@ const updateuserController = async (req, res, next) => {
       user.bio = req.body.bio;
     }
     await user.save();
-    res.send(user);
+    const updatedUser = {
+      username: user.username,
+      email: user.email,
+      bio: user.bio,
+    };
+    res.send({ updatedUser: updatedUser });
   } catch {
     res.status(404);
     res.send({

@@ -27,7 +27,7 @@ const loginValidation = (req, res, next) => {
 //update user validation
 const updateUserValidation = (req, res, next) => {
   const schema = Joi.object({
-    name: Joi.string().min(6),
+    username: Joi.string().min(6),
     email: Joi.string().min(6).email(),
     password: Joi.string().min(6),
     bio: Joi.string().min(15),
@@ -64,7 +64,7 @@ const editpostValidation = (req, res, next) => {
 //Message validation
 const messageValidation = (req, res, next) => {
   const schema = Joi.object({
-    names: Joi.string().min(6).required(),
+    username: Joi.string().min(6).required(),
     email: Joi.string().min(6).required().email(),
     subject: Joi.string().min(6).required(),
     message: Joi.string().min(6).required(),

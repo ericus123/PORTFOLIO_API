@@ -20,7 +20,12 @@ const signupController = async (req, res) => {
   });
   try {
     const savedUser = await user.save();
-    res.send(savedUser);
+    const registeredUser = {
+      username: savedUser.username,
+      email: savedUser.email,
+      bio: savedUser.bio,
+    };
+    res.send(registeredUser);
   } catch (err) {
     res.status(400).send(err);
   }

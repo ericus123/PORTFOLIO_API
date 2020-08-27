@@ -18,10 +18,13 @@ const loginController = async (req, res) => {
     process.env.TOKEN_SECRET
   );
   res.header("auth-token", token);
-
+  const loggedinUser = {
+    username: user.username,
+    email: user.email,
+  };
   res.send({
     token: token,
-    success: "Welcome " + user.name + "!" + "  You are now logged in",
+    user: loggedinUser,
   });
 };
 
