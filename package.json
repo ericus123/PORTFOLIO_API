@@ -1,9 +1,8 @@
 {
-  "name": "brand-api",
+  "name": "node-js",
   "version": "1.0.0",
-  "description": "This is an API for my brand website",
-  "type": "module",
-  "main": "index.js",
+  "description": "",
+  "main": "app.js",
   "directories": {
     "doc": "docs"
   },
