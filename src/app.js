@@ -5,10 +5,12 @@ import userRoute from "./routes/users";
 import authRoute from "./routes/auth";
 import postRoute from "./routes/posts";
 import messageRoute from "./routes/messages";
+import bodyParser from "body-parser";
+
 //express app
 
 const app = express();
-
+app.use(bodyParser.urlencoded({ extended: true }));
 dotenv.config();
 
 //connect to dba
