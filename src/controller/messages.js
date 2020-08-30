@@ -10,7 +10,7 @@ const messagesController = async (req, res) => {
   });
   try {
     const savedMessage = await message.save();
-    res.send({ ms: savedMessage, success: "Message sent!" });
+    res.send({ msg: savedMessage, success: "Message sent!" });
   } catch (err) {
     res.status(400).send(err);
   }
