@@ -1,6 +1,6 @@
 import User from "../model/User";
 import bcrypt from "bcryptjs";
-const bodyParser = require("body-parser");
+import bodyParser from "body-parser";
 const signupController = async (req, res) => {
   //Check if a user is already in the database
   const emailExists = await User.findOne({ email: req.body.email });
