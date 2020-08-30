@@ -29,8 +29,7 @@
     "node": "10.19.0"
   },
   "scripts": {
-    "start": "nodemon -r esm index.js",
-    "test": "jest --testEnvironment=node --verbose --forceExit --watchAll --maxWorkers=1"
+    "start": "nodemon -r esm index.js"
   },
   "author": "",
   "license": "ISC",
