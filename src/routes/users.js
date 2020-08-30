@@ -12,5 +12,5 @@ userRoute.get("/getusers", verify, getusersController);
 userRoute.put("/update", verify, updateUserValidation, updateuserController);
 
 //get profile info
-userRoute.get("/getprofile", verify, getprofileController);
+userRoute.get("/getprofile", getprofileController);
 export default userRoute;
