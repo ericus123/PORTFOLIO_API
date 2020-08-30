@@ -11,9 +11,9 @@ const messageSchema = new mongoose.Schema({
     required: true,
     email: true,
   },
-  subject: {
+  country: {
     type: String,
-    min: 6,
+    min: 30,
     required: true,
   },
   message: {

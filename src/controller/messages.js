@@ -5,7 +5,7 @@ const messagesController = async (req, res) => {
   const message = new Message({
     username: req.body.username,
     email: req.body.email,
-    subject: req.body.subject,
+    country: req.body.country,
     message: req.body.message,
   });
   try {
