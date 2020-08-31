@@ -8,7 +8,7 @@ import updateuserController from "../controller/updateUser";
 import getusersController from "../controller/getusers";
 import getprofileController from "../controller/getprofile";
 //get a list of all users
-userRoute.get("/getusers", corsPolicy, verify, getusersController);
+userRoute.get("/getusers", verify, getusersController);
 //update user info route
 userRoute.put(
   "/update",
@@ -19,5 +19,5 @@ userRoute.put(
 );
 
 //get profile info
-userRoute.get("/getprofile", corsPolicy, verify, getprofileController);
+userRoute.get("/getprofile", verify, getprofileController);
 export default userRoute;
