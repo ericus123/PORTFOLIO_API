@@ -1,5 +1,5 @@
 import User from "../model/User";
-const getprofileController = async (req, res, next) => {
+const getprofileController = async (req, res) => {
   const id = req.user.id;
   try {
     const user = await User.findOne({ _id: id });
