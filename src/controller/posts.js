@@ -1,5 +1,6 @@
 import Post from "../model/Post";
 const createpostController = async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
   //Create a new Post
   const post = new Post({
     title: req.body.title,

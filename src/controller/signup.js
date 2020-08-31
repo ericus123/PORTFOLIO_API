@@ -1,6 +1,7 @@
 import User from "../model/User";
 import bcrypt from "bcryptjs";
 const signupController = async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
   //Check if a user is already in the database
   const emailExists = await User.findOne({ email: req.body.email });
   if (emailExists)

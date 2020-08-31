@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const loginController = async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
   //Check if email exists
   const user = await User.findOne({ email: req.body.email });
   if (!user) return res.status(400).send("Email not found");
