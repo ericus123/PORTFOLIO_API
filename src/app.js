@@ -7,6 +7,7 @@ import postRoute from "./routes/posts";
 import messageRoute from "./routes/messages";
 import bodyParser from "body-parser";
 import cors from "cors";
+import axios from "axios";
 //express app
 
 const app = express();
