@@ -21,6 +21,7 @@ const loginController = async (req, res) => {
   const loggedinUser = {
     username: user.username,
     email: user.email,
+    isAdmin: user.isAdmin,
   };
   res.send({
     token: token,
