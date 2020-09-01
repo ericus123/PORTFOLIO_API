@@ -16,6 +16,7 @@ const signupController = async (req, res) => {
     email: req.body.email,
     password: hashedPassword,
     bio: req.body.bio,
+    isAdmin: false,
   });
   try {
     const savedUser = await user.save();
