@@ -45,6 +45,9 @@ const updatepostController = async (req, res) => {
     if (req.body.description) {
       post.content = req.body.content;
     }
+    if (req.body.author) {
+      post.author = req.body.author;
+    }
     await post.save();
     res.send({ message: "Post updated successfully", post: post });
   } catch {
