@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     min: 15,
   },
   isAdmin: {
-    type: BigInt,
+    type: Number,
     required: false,
   },
   date: {
