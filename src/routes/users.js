@@ -10,13 +10,7 @@ import getprofileController from "../controller/getprofile";
 //get a list of all users
 userRoute.get("/getusers", cors(), verify, getusersController);
 //update user info route
-userRoute.put(
-  "/update",
-  cors(),
-  verify,
-  updateUserValidation,
-  updateuserController
-);
+userRoute.patch("/update", verify, updateUserValidation, updateuserController);
 
 //get profile info
 userRoute.get("/getprofile", cors(), verify, getprofileController);
