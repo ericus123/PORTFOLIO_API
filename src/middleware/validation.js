@@ -27,7 +27,7 @@ const loginValidation = (req, res, next) => {
 //update user validation
 const updateUserValidation = (req, res, next) => {
   const schema = Joi.object({
-    username: Joi.string().min(6),
+    username: Joi.string().min(6).max(14),
     email: Joi.string().min(6).email(),
     password: Joi.string().min(6),
     bio: Joi.string().min(15),
