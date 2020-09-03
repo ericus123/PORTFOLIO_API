@@ -3,7 +3,6 @@ import Message from "../model/Message";
 const messagesController = async (req, res) => {
   //Create a new message
   const message = new Message({
-    username: req.body.username,
     email: req.body.email,
     subject: req.body.subject,
     message: req.body.message,
