@@ -10,8 +10,8 @@ const updateuserController = async (req, res) => {
     const user = await User.findOne({ _id: id });
     if (!user) return res.status(404).json({ error: "user not found" });
 
-    if (req.body.name) {
-      user.name = req.body.name;
+    if (req.body.username) {
+      user.username = req.body.username;
     }
     if (req.body.email) {
       user.email = req.body.email;
