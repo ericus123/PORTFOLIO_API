@@ -1,10 +1,5 @@
 import mongoose from "mongoose";
 const messageSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    min: 6,
-  },
   email: {
     type: String,
     min: 6,
