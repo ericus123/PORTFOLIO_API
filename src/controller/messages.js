@@ -3,8 +3,9 @@ import Message from "../model/Message";
 const messagesController = async (req, res) => {
   //Create a new message
   const message = new Message({
+    names: req.body.Names,
     email: req.body.email,
-    subject: req.body.subject,
+    country: req.body.country,
     message: req.body.message,
   });
   try {

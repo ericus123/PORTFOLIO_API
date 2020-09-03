@@ -64,9 +64,9 @@ const editpostValidation = (req, res, next) => {
 //Message validation
 const messageValidation = (req, res, next) => {
   const schema = Joi.object({
-    username: Joi.string().min(6).required(),
+    names: Joi.string().min(6).max(20).required(),
     email: Joi.string().min(6).required().email(),
-    subject: Joi.string().min(6).required(),
+    country: Joi.string().required(),
     message: Joi.string().min(6).required(),
   });
   const { error } = schema.validate(req.body);
