@@ -1,8 +1,5 @@
 import User from "../model/User";
-const getprofileController = async (req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "*");
-  next();
+const getprofileController = async (req, res) => {
   const id = req.user.id;
   try {
     const user = await User.findOne({ _id: id });
