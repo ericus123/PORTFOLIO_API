@@ -39,7 +39,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/messages", messageRoute);
-// app.use("/", (req, res) => {
-//   res.status(200).send({ message: "Hello ! Welcome on our website " });
-// });
+app.use("/", (req, res) => {
+  res.status(200).send({ message: "Hello ! Welcome on our website " });
+});
 export default app;
