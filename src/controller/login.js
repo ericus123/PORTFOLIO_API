@@ -27,6 +27,7 @@ const loginController = async (req, res) => {
     token: token,
     user: loggedinUser,
   });
+  console.log(res.body);
 };
 
 export default loginController;

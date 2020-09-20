@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { messageValidation } from "../middleware/validation";
 import verify from "../middleware/verifyToken";
+import checkemailExistence from '../middleware/checkEmail'
 
 import {
   messagesController,
@@ -10,7 +11,7 @@ import {
 
 const messageRoute = new Router();
 //create messages
-messageRoute.post("/create", messageValidation, messagesController);
+messageRoute.post("/create", messageValidation,checkemailExistence, messagesController);
 
 //Get messages form db
 

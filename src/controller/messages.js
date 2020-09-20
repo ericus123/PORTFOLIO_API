@@ -1,5 +1,6 @@
 import Message from "../model/Message";
 
+
 const messagesController = async (req, res) => {
   //Create a new message
   const message = new Message({

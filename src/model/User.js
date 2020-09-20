@@ -1,3 +1,4 @@
+
 import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
   username: {
@@ -26,6 +27,14 @@ const userSchema = new mongoose.Schema({
   isAdmin: {
     type: Number,
     required: false,
+  },
+  isVerified:{
+    type: Boolean,
+    default:false,
+  },
+  onlinestatus:{
+    type: String,
+    default:"inactive",
   },
   date: {
     type: Date,
