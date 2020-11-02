@@ -11,19 +11,19 @@ import {
   deletepostController,
 } from "../controller/posts";
 
-postRoute.post("/create", verify, postValidation, createpostController);
+postRoute.post("/", verify, postValidation, createpostController);
 
 //Get all posts form db
 
-postRoute.get("/getall", getallpostsController);
+postRoute.get("/", getallpostsController);
 //Get a single post form db
-postRoute.get("/getsingle/:id", getsinglepostController);
+postRoute.get("/:id", getsinglepostController);
 
 //Edit post
 
-postRoute.put("/update/:id", verify, editpostValidation, updatepostController);
+postRoute.put("/:id", verify, editpostValidation, updatepostController);
 
 //Delete  post
 
-postRoute.delete("/delete/:id", verify, deletepostController);
+postRoute.delete("/:id", verify, deletepostController);
 export default postRoute;

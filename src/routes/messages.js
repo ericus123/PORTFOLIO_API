@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { messageValidation } from "../middleware/validation";
 import verify from "../middleware/verifyToken";
-import checkemailExistence from '../middleware/checkEmail'
 
 import {
   messagesController,
@@ -11,13 +10,13 @@ import {
 
 const messageRoute = new Router();
 //create messages
-messageRoute.post("/create", messageValidation,checkemailExistence, messagesController);
+messageRoute.post("/", messageValidation,messagesController);
 
 //Get messages form db
 
-messageRoute.get("/get", verify, getmessagesController);
+messageRoute.get("/", verify, getmessagesController);
 //Delete a message
 
-messageRoute.delete("/delete/:id", verify, deletemsgController);
+messageRoute.delete("/:id", verify, deletemsgController);
 
 export default messageRoute;

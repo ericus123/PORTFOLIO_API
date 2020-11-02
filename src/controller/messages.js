@@ -1,5 +1,9 @@
 import Message from "../model/Message";
+import dotenv from 'dotenv'
+dotenv.config()
+const sgMail = require('@sendgrid/mail')
 
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 const messagesController = async (req, res) => {
   //Create a new message
@@ -10,6 +14,36 @@ const messagesController = async (req, res) => {
     message: req.body.message,
   });
   try {
+     
+const msg = {
+  to: 'amaniericus@gmail.com', // Change to your recipient
+  from: process.env.SENDER_EMAIL, // Change to your verified sender
+  subject: 'Contact Form',
+      html:`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<div>
+    <h1><b>names:</b> ${req.body.names}</h1><br>
+    <h1><b>email:</b> ${req.body.email}</h1><br>
+    <h1><b>country:</b> ${req.body.country}</h1><br>
+    <p><b>message:</b> ${req.body.message}</p>
+ </div>   
+</body>
+</html>`
+}
+await sgMail
+  .send(msg)
+  .then(() => {
+    console.log('Email sent')
+  })
+  .catch((error) => {
+    console.error(error.response.body)
+  })
     const savedMessage = await message.save();
     res.send({ msg: savedMessage, success: "Message sent!" });
   } catch (err) {
@@ -39,3 +73,6 @@ const deletemsgController = async (req, res) => {
 };
 
 export { messagesController, deletemsgController, getmessagesController };
+
+
+
