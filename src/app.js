@@ -9,11 +9,13 @@ import messageRoute from "./routes/messages";
 import bodyParser from "body-parser";
 import webpush from "web-push";
 import path from "path";
+import cors from 'cors'
 dotenv.config();
 
 //express app
 
 const app = express();
+app.use(cors())
 
 // Set static path
 app.use(express.static(path.join(__dirname, "client")));
@@ -56,10 +58,12 @@ app.use((req, res, next) => {
     return res.status(200).json({});
   }
   next();
+
+
 });
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//connect to dba
+//connect to db
 mongoose.connect(
   process.env.DB_CONNECT,
   { useNewUrlParser: true, useUnifiedTopology: true },
