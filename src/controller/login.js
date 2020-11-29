@@ -18,14 +18,14 @@ const loginController = async (req, res) => {
   if (!login) return res.status(400).json({ error: "Incorrect credentials" });
 
   //create and assign a token
-  const token = jwt.sign(
+  const token = await jwt.sign(
     {
       user,
     },
     process.env.TOKEN_SECRET
   );
   res.header("auth-token", token);
-  res.status(200).json({
+  return res.status(200).json({
     msg: "logged in successfuly",
     token: token,
   });
