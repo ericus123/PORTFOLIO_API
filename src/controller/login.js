@@ -3,31 +3,32 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const loginController = async (req, res) => {
-  //Check if email exists
+  //Check credentials
   const user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send("Email not found");
-
-  //password is correct
+  if (!user) return res.status(400).json({ error: "Incorrect credentials" });
   const validPass = await bcrypt.compare(req.body.password, user.password);
-  if (!validPass) return res.status(400).send({ error: "Invalid password" });
+  if (!validPass)
+    return res.status(400).json({ error: "Incorrect credentials" });
+
+  const login = await User.findOne({
+    email: req.body.email,
+    password: user.password,
+  });
+
+  if (!login) return res.status(400).json({ error: "Incorrect credentials" });
+
   //create and assign a token
   const token = jwt.sign(
     {
-      id: user._id,
+      user,
     },
     process.env.TOKEN_SECRET
   );
   res.header("auth-token", token);
-  const loggedinUser = {
-    username: user.username,
-    email: user.email,
-    isAdmin: user.isAdmin,
-  };
-  res.send({
+  res.status(200).json({
+    msg: "logged in successfuly",
     token: token,
-    user: loggedinUser,
   });
-  console.log(res.body);
 };
 
 export default loginController;

@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
   username: {
@@ -24,17 +23,18 @@ const userSchema = new mongoose.Schema({
     required: true,
     min: 15,
   },
-  isAdmin: {
-    type: Number,
-    required: false,
-  },
-  isVerified:{
+  isVerified: {
     type: Boolean,
-    default:false,
+    default: false,
   },
-  onlinestatus:{
+  onlinestatus: {
     type: String,
-    default:"inactive",
+    default: "inactive",
+  },
+  role: {
+    type: String,
+    default: "basic",
+    enum: ["basic", "admin", "superAdmin"],
   },
   date: {
     type: Date,

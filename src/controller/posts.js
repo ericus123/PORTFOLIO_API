@@ -4,7 +4,7 @@ const createpostController = async (req, res) => {
   const post = new Post({
     title: req.body.title,
     description: req.body.description,
-    author: req.body.author,
+    author: req.user,
   });
   try {
     const savedPost = await post.save();

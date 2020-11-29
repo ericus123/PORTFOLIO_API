@@ -1,18 +1,12 @@
 //VALIDATION
 const Joi = require("@hapi/joi");
-const { rearg } = require("lodash");
-
 //Register validation
 const signupValidation = (req, res, next) => {
   const schema = Joi.object({
-    username: Joi.string()
-      .min(6)
-      .max(14)
-      .required()
-      .messages({
-        "string.base": res.__("Username must be a string"),
-        "string.min": res.__("username must be equal or over 6 characters"),
-      }),
+    username: Joi.string().min(6).max(14).required().messages({
+      "string.base": "Username must be a string",
+      "string.min": "username must be equal or over 6 characters",
+    }),
     email: Joi.string().min(6).required().email(),
     password: Joi.string().min(6).required(),
     bio: Joi.string().min(15).required(),
