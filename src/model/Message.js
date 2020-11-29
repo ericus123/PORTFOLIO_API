@@ -1,9 +1,7 @@
 import mongoose from "mongoose";
 const messageSchema = new mongoose.Schema({
-  names: {
+  name: {
     type: String,
-    min: 6,
-    max: 20,
     required: true,
   },
   email: {
@@ -11,10 +9,6 @@ const messageSchema = new mongoose.Schema({
     min: 6,
     required: true,
     email: true,
-  },
-  country: {
-    type: String,
-    required: true,
   },
   message: {
     type: String,

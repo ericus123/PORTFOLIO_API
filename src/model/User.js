@@ -18,24 +18,43 @@ const userSchema = new mongoose.Schema({
     max: 1024,
     min: 6,
   },
-  bio: {
+  firstName: {
     type: String,
     required: true,
-    min: 15,
+    max: 14,
+    min: 3,
+  },
+  lastName: {
+    type: String,
+    required: true,
+    max: 14,
+    min: 3,
+  },
+  bio: {
+    type: String,
+    default: null,
   },
   isVerified: {
     type: Boolean,
     default: false,
-  },
-  onlinestatus: {
-    type: String,
-    default: "inactive",
   },
   role: {
     type: String,
     default: "basic",
     enum: ["basic", "admin", "superAdmin"],
   },
+  imageUrl: {
+    type: String,
+    default: null,
+  },
+  posts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Posts",
+    },
+  ],
+  passwordResetToken: String,
+  passwordResetExpires: Date,
   date: {
     type: Date,
     default: Date.now,
