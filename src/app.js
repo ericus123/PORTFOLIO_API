@@ -13,6 +13,7 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import cors from "cors";
 import cloudinary from "cloudinary";
+import Post from "./model/Post";
 
 //express app
 
@@ -35,6 +36,7 @@ mongoose.connect(
   { useNewUrlParser: true, useUnifiedTopology: true },
   () => console.log("connected to db!")
 );
+
 
 //Middleware
 

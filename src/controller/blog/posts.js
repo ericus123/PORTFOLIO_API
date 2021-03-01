@@ -563,10 +563,11 @@ class PostController {
               query: req.query.term,
               path: ["description", "title"],
             },
+           
           },
+          {score:{$meta:"textScore"}},
         },
       ]);
-
       res.status(200).json({
         msg: "Search results retrieved successfuly",
         posts: posts,
