@@ -13,12 +13,10 @@ authRoute.post("/register", userValidation, AuthController.Signup);
 authRoute.post("/login", loginValidation, AuthController.Login);
 authRoute.put(
   "/verify/:id/:token",
-  AuthMiddleware.isNotVerified,
   AuthController.ConfEmail
 );
 authRoute.post(
-  "/confirmation/resend/:id",
-  AuthMiddleware.isNotVerified,
+  "/confirmation/resend/:email",
   AuthController.ResendConfEmail
 );
 authRoute.post(

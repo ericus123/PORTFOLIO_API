@@ -2,6 +2,30 @@ const Joi = require("@hapi/joi");
 
 export const userValidation = (req, res, next) => {
   const schema = Joi.object({
+    firstName: Joi.string()
+      .min(3)
+      .max(12)
+      .regex(/[a-zA-Z]/)
+      .required()
+      .messages({
+        "string.base": "First name must contain letters only ",
+        "string.empty": "Please fill in your first name",
+        "string.min": "Fisrt name must be at least {#limit} characters long",
+        "string.max": "First name must be below {#limit} characters long",
+        "any.required": "First name is required",
+      }),
+    lastName: Joi.string()
+      .min(3)
+      .max(12)
+      .regex(/[a-zA-Z]/)
+      .required()
+      .messages({
+        "string.base": "Last name must contain letters only ",
+        "string.empty": "Please fill in your last name",
+        "string.min": "Last name must be at least {#limit} characters long",
+        "string.max": "Last name must be below {#limit} characters long",
+        "any.required": "Last name is required",
+      }),
     username: Joi.string()
       .min(3)
       .max(12)
@@ -35,31 +59,7 @@ export const userValidation = (req, res, next) => {
       "any.required": "Password confirmation is required",
     }),
 
-    firstName: Joi.string()
-      .min(3)
-      .max(12)
-      .regex(/[a-zA-Z]/)
-      .required()
-      .messages({
-        "string.base": "First name must contain letters only ",
-        "string.empty": "Please fill in your first name",
-        "string.min": "Fisrt name must be at least {#limit} characters long",
-        "string.max": "First name must be below {#limit} characters long",
-        "any.required": "First name is required",
-      }),
-    lastName: Joi.string()
-      .min(3)
-      .max(12)
-      .regex(/[a-zA-Z]/)
-      .required()
-      .messages({
-        "string.base": "Last name must contain letters only ",
-        "string.empty": "Please fill in your last name",
-        "string.min": "Last name must be at least {#limit} characters long",
-        "string.max": "Last name must be below {#limit} characters long",
-        "any.required": "Last name is required",
-      }),
-      subscribedNewsLetter: Joi.boolean(),
+    subscribedNewsLetter: Joi.boolean(),
   });
   const { error } = schema.validate(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });

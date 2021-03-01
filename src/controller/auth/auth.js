@@ -53,10 +53,12 @@ class AuthController {
     });
 
     if (!login) return res.status(400).json({ error: "Incorrect credentials" });
-    if (!user.isVerified)
+    if (!user.isVerified) {
       return res
         .status(400)
         .json({ error: "Your account has not been verified" });
+    }
+
     //create and assign a token
     const token = jwt.sign(
       {
@@ -111,12 +113,12 @@ class AuthController {
           url,
         }),
       };
-      transport.sendMail(ConfEmailOptions, async (err) => {
-        if (err) {
+      transport.sendMail(ConfEmailOptions, async (error) => {
+        if (error) {
           await user.delete();
           await token.delete();
           return res.status(500).json({
-            msg: err.message,
+            err: error.message,
             error: "Can't send verification email, try again",
           });
         }
@@ -135,6 +137,10 @@ class AuthController {
     try {
       const { id, token } = req.params;
       const user = await User.findOne({ _id: id });
+      if (user.isVerified)
+        return res
+          .status(200)
+          .json({ msg: "Your account is already verified, please login!" });
       const _token = await VerToken.findOne({
         token: token,
         _userId: id,
@@ -142,7 +148,7 @@ class AuthController {
       if (!_token) return res.status(400).json({ error: "Invalid token" });
       user.isVerified = true;
       await user.save();
-      await VerToken.deleteMany({ where: { _userId: id } });
+      await VerToken.deleteMany({ _userId: id });
       return res.status(201).json({
         msg: "Your account is verified now, please login!",
       });
@@ -154,14 +160,18 @@ class AuthController {
   }
   static async ResendConfEmail(req, res) {
     try {
-      const { id } = req.params;
+      const { email } = req.params;
 
       const user = await User.findOne({
-        _id: id,
+        email: email,
       });
 
       if (!user) return res.status(400).json({ error: "Can't find user" });
-      const { firstName, email } = user;
+      if (user.isVerified)
+        return res
+          .status(400)
+          .json({ msg: "Your account is already verified, please login!" });
+      const { firstName } = user;
       const token = new VerToken({
         _userId: user._id,
         token: crypto.randomBytes(16).toString("hex"),
@@ -204,9 +214,9 @@ class AuthController {
         return res.status(400).json({ error: "Can't find user" });
       }
       if (!user.isVerified) {
-        return res.redirect(
-          `${process.env.FRONTEND_URL}/account/confirm/${user._id}`
-        );
+        console.log("unverified");
+        res.redirect(`${process.env.FRONTEND_URL}/account/confirm/${user._id}`);
+        // return res.status(400).json({error:"Unverified account"})
       }
       const Token = new PassResetToken({
         _userId: user._id,
@@ -231,8 +241,9 @@ class AuthController {
             error: "Can't send password reset link , try again",
           });
         }
+        res.set("content-type", "text/html");
         return res.status(200).json({
-          msg: `Password reset link has been sent to ${email}`,
+          msg: `Password reset link has been sent to <b> ${email} `,
           email: email,
           token: Token.token,
         });
