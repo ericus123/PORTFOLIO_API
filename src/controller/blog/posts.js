@@ -32,7 +32,7 @@ class PostController {
       const post = new Post({
         title: req.body.title,
         description: req.body.description,
-        author: `amani`,
+        author: req.user.id,
         category: req.body.category,
         imageUrl: uploadResponse.url,
       });
