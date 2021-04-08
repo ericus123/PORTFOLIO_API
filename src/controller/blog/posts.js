@@ -556,6 +556,10 @@ class PostController {
   }
   static async searchPosts(req, res) {
     try {
+      const query = req.query.term;
+      if(!query){
+        return res.status(400).json({error:"Search term is required"})
+      }
       const posts = await Post.aggregate([
         {
           $search: {
