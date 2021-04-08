@@ -272,6 +272,11 @@ class AuthController {
         .json({ error: "Something went wrong", err: error });
     }
   }
+  static async CheckLogin(req, res) {
+    return res
+      .status(200)
+      .json({ msg: "User is logged in successfuly", user: req.user });
+  }
 }
 
 export default AuthController;

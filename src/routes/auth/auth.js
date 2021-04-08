@@ -11,6 +11,11 @@ import AuthMiddleware from "../../middleware/AuthMiddleware";
 
 authRoute.post("/register", userValidation, AuthController.Signup);
 authRoute.post("/login", loginValidation, AuthController.Login);
+authRoute.post(
+  "/check-login",
+  AuthMiddleware.checkToken,
+  AuthController.CheckLogin
+);
 authRoute.put(
   "/verify/:id/:token",
   AuthMiddleware.isNotVerified,
