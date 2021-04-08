@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import slugify from "slugify";
 const postSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -41,10 +41,20 @@ const postSchema = new mongoose.Schema({
       ref: "PostUnLikes",
     },
   ],
+  slug: {
+    type: String,
+    unique: true,
+  },
   date: {
     type: Date,
     default: Date.now,
   },
 });
 
+postSchema.pre("validate", function (next) {
+  if (this.title) {
+    this.slug = slugify(this.title, { lower: true, strict: true });
+  }
+  next();
+});
 export default mongoose.model("Posts", postSchema);
