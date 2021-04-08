@@ -1,3 +1,1 @@
-This repository is all about my brand API with node js
-
-[![Build Status](https://travis-ci.com/ericus123/BRAND-API.svg?branch=FT-Endpoints)](https://travis-ci.com/ericus123/BRAND-API)
+[![Build Status](https://www.travis-ci.com/ericus123/PORTFOLIO_API.svg?branch=develop)](https://www.travis-ci.com/ericus123/PORTFOLIO_API)
