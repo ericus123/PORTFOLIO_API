@@ -133,6 +133,8 @@ class PostController {
           description: req.body.description,
           category: req.body.category,
           imageUrl: req.body.url,
+          updatedBy: req.user.id,
+          updatedAt: Date.now()
         },
       });
       const updatedPost = await Post.findOne({ _id: id });
@@ -172,6 +174,7 @@ class PostController {
     const cat = new Category({
       name: req.body.name,
       description: req.body.description,
+      createdBy: req.user.id,
     });
     try {
       await cat.save();
@@ -544,7 +547,7 @@ class PostController {
           saveUnlike();
         }
       } else {
-        res.status(400).json({
+        return res.status(400).json({
           error: `reaction can't be ${action}`,
         });
       }
@@ -557,8 +560,8 @@ class PostController {
   static async searchPosts(req, res) {
     try {
       const query = req.query.term;
-      if(!query){
-        return res.status(400).json({error:"Search term is required"})
+      if (!query) {
+        return res.status(400).json({ error: "Search term is required" });
       }
       const posts = await Post.aggregate([
         {

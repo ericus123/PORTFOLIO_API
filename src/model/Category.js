@@ -9,5 +9,16 @@ const categorySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  updatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+  },
 });
 export default mongoose.model("Categories", categorySchema);

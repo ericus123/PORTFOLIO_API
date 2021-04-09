@@ -45,9 +45,17 @@ const postSchema = new mongoose.Schema({
     type: String,
     unique: true,
   },
-  date: {
+  updatedBy:{
+   type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+  },
+  createdAt: {
     type: Date,
     default: Date.now,
+  },
+  updatedAt:{
+    type:Date,
+    default: null
   },
 });
 
