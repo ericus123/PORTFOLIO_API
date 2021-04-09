@@ -30,9 +30,24 @@ postRoute.post(
   AuthMiddleware.checkToken,
   AuthMiddleware.checkAdmin,
   categoryValidation,
+  PostsMiddleware.checkCatCreation,
   PostController.createPostCat
 );
-postRoute.get("/category", PostController.getPostCats);
+postRoute.patch(
+  "/category/:category",
+  AuthMiddleware.checkToken,
+  AuthMiddleware.checkAdmin,
+  categoryValidation,
+  PostsMiddleware.checkCategoryUpdate,
+  PostController.updatePostCat
+);
+postRoute.delete(
+  "/category/:category",
+  AuthMiddleware.checkToken,
+  AuthMiddleware.checkAdmin,
+  PostController.deleteCategory
+);
+postRoute.get("/category/:category", PostController.getPostCat);
 postRoute.get("/search", PostController.searchPosts);
 postRoute.get("/category/:category", PostController.getPostsByCategory);
 postRoute.get("/:id", PostController.getPost);

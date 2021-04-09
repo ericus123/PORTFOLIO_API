@@ -264,19 +264,11 @@ export const postValidation = (req, res, next) => {
       "any.required": "Post body is required",
       "string.max": "Post body must be less than  {#limit} characters long",
     }),
-
-    category: Joi.string()
-      .min(4)
-      .max(20)
-      .regex(/[a-zA-Z]/)
-      .required()
-      .messages({
-        "string.base": "Post category must contain letters only ",
-        "string.empty": "Please fill in the post category",
-        "string.min": "Category must be at least {#limit} characters long",
-        "string.max": "Category must be below {#limit} characters long",
-        "any.required": "Category is required",
-      }),
+    category: Joi.string().required().messages({
+      "number.base": "Category must be  a string",
+      "string.empty": "Please fill in the category",
+      "any.required": "Category is required",
+    }),
     imageUrl: Joi.string().uri().messages({
       "string.base": "Url must be a link",
       "string.empty": "Image url is required",

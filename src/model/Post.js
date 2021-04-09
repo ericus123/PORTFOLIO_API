@@ -17,8 +17,8 @@ const postSchema = new mongoose.Schema({
     ref: "Users",
   },
   category: {
-    type: String,
-    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Categories",
   },
   imageUrl: {
     type: String,
@@ -45,17 +45,17 @@ const postSchema = new mongoose.Schema({
     type: String,
     unique: true,
   },
-  updatedBy:{
-   type: mongoose.Schema.Types.ObjectId,
+  updatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Users",
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
-  updatedAt:{
-    type:Date,
-    default: null
+  updatedAt: {
+    type: Date,
+    default: null,
   },
 });
 

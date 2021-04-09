@@ -29,6 +29,10 @@ class PostController {
     try {
       const fileStr = req.body.img;
       const uploadResponse = await cloudinary.uploader.upload(fileStr);
+      const category = await Category.findOne({ _id: req.body.category });
+      if (!category) {
+        return res.status(404).json({ error: "Category not found" });
+      }
       const post = new Post({
         title: req.body.title,
         description: req.body.description,
@@ -42,7 +46,7 @@ class PostController {
         { $push: { posts: savedPost._id } },
         { new: true, useFindAndModify: false }
       );
-      res
+      return res
         .status(201)
         .json({ message: "post created succesfully", article: savedPost });
     } catch (err) {
@@ -82,22 +86,25 @@ class PostController {
       //     limit: limit,
       //   };
       // }
-      const all = await Post.find({}).sort({ date: -1 });
+      const all = await Post.find({}).populate("category").sort({ date: -1 });
       results.maxPages = Math.ceil(all.length / limit);
       results.results = await Post.find()
+        .populate("category")
         .sort({ date: -1 })
         .limit(limit)
         .skip(startIndex)
         .exec();
 
-      res.status(200).json({
+      return res.status(200).json({
         msg: "Posts fetched successfuly",
         postsPerPage: results,
         posts: all,
       });
       next();
     } catch (error) {
-      res.status(500).json({ error: "Something went wrong", err: error });
+      return res
+        .status(500)
+        .json({ error: "Something went wrong", err: error });
     }
   }
 
@@ -114,6 +121,7 @@ class PostController {
         },
         "likes",
         "unLikes",
+        "category",
       ]);
       res
         .status(200)
@@ -134,11 +142,11 @@ class PostController {
           category: req.body.category,
           imageUrl: req.body.url,
           updatedBy: req.user.id,
-          updatedAt: Date.now()
+          updatedAt: Date.now(),
         },
       });
       const updatedPost = await Post.findOne({ _id: id });
-      res
+      return res
         .status(201)
         .json({ message: "Post updated successfully", post: updatedPost });
     } catch {
@@ -178,26 +186,69 @@ class PostController {
     });
     try {
       await cat.save();
-      res
+      return res
         .status(201)
         .json({ msg: "Category is created successfuly", category: cat });
     } catch (error) {
-      res.status(400).json({ error: "Failed to create category" });
+      return res.status(400).json({ error: "Failed to create category" });
+    }
+  }
+  static async updatePostCat(req, res) {
+    try {
+      const category = await Category.findByIdAndUpdate(
+        req.params.category,
+        {
+          $set: {
+            name: req.body.name,
+            description: req.body.description,
+            updatedBy: req.user.id,
+            updatedAt: Date.now()
+          },
+        },
+        { useFindAndModify: false }
+      );
+      return res.status(201).json({ msg: "Category is updated successfuly" });
+    } catch (error) {
+      return res.status(400).json({ error: "Failed to update category" });
+    }
+  }
+  static async deleteCategory(req, res) {
+    try {
+      await Category.findOneAndDelete(
+        { _id: req.params.category },
+        { useFindAndModify: false }
+      );
+      return res.status(201).json({ msg: "Category deleted successfuly" });
+    } catch (error) {
+      return res.status(400).json({ error: "Something went wrong" });
     }
   }
   static async getPostCats(req, res) {
     try {
       const categories = await Category.find({});
-      if (!categories)
-        return res.status(400).json({
-          error: "Failed to get categories",
-        });
-      res.status(200).json({
-        msg: "Post categories retrieved successfuly",
+      return res.status(200).json({
+        msg: "Post categories fetched successfuly",
         categories: categories,
       });
     } catch (error) {
-      res.status(400).json({ error: "Failed to get post category" });
+      return res.status(400).json({ error: "Failed to get post category" });
+    }
+  }
+  static async getPostCat(req, res) {
+    try {
+      const category = await Category.findOne({
+        _id: req.params.category,
+      });
+      if (!category)
+        return res.status(404).json({
+          error: "Category not found",
+        });
+      return res.status(200).json({
+        msg: "Post category fetched successfuly",
+        category: category,
+      });
+    } catch (error) {
+      return res.status(400).json({ error: "Failed to get post category" });
     }
   }
 
@@ -246,9 +297,9 @@ class PostController {
         },
         { useFindAndModify: false }
       );
-      res.status(201).json({ msg: "Edited comment " });
+      return res.status(201).json({ msg: "Edited comment " });
     } catch (error) {
-      res.status(400).json({ error: "Error occured" });
+      return res.status(400).json({ error: "Error occured" });
     }
   }
   static async editCommentReply(req, res) {

@@ -11,7 +11,8 @@ const categorySchema = new mongoose.Schema({
   },
   updatedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Users",
+    ref: "User",
+    default: null,
   },
   createdAt: {
     type: Date,
@@ -19,6 +20,11 @@ const categorySchema = new mongoose.Schema({
   },
   updatedAt: {
     type: Date,
+    default: null,
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
   },
 });
 export default mongoose.model("Categories", categorySchema);
