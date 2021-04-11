@@ -34,5 +34,20 @@ class AuthMiddleware {
         .status(400)
         .json({ error: "Your account is already verified, please login!" });
   }
+  static async profileIsIncomplete(req, res, next) {
+    const { id } = req.user;
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    if (user.isComplete) {
+      return res
+        .status(400)
+        .json({ error: "Your profile is already complete" });
+    }
+    req.profile = user;
+    next();
+  }
 }
 export default AuthMiddleware;

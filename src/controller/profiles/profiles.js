@@ -1,7 +1,7 @@
 import User from "../../model/User";
 import dotenv from "dotenv";
 var cloudinary = require("cloudinary").v2;
-dotenv.config()
+dotenv.config();
 
 var uploads = {};
 
@@ -21,23 +21,28 @@ class ProfileController {
 
     try {
       const user = await User.findOne({ email: req.user.email });
-      if (!user) return res.status(400).json({ error: "can't update user" });
-
+      if (!user) return res.status(404).json({ error: "User not found" });
+      if (!user.isComplete) {
+        return res
+          .status(400)
+          .json({ error: "Please complete your profile first" });
+      }
       await user.updateOne({
         $set: {
           username: req.body.username,
           bio: req.body.bio,
           firstName: req.body.firstName,
           lastName: req.body.lastName,
+          imageUrl: req.body.imageUrl,
         },
       });
       const updatedUser = await User.find({ email: req.user.email });
-      res
+      return res
         .status(201)
-        .json({ msg: "user updated successfuly", user: updatedUser });
+        .json({ msg: "User updated successfuly", user: updatedUser });
     } catch {
-      res.status(400).json({
-        error: "failed to update profile",
+      return res.status(400).json({
+        error: "Failed to update profile",
       });
     }
   }
@@ -46,39 +51,37 @@ class ProfileController {
       const user = await User.find({
         email: req.user.email,
       }).populate("posts");
-      if (!user) return res.status(400).json({ error: "cant't find user" });
-      res.status(200).json({ profile: user });
+      if (!user) return res.status(404).json({ error: "Profile not found" });
+      return res.status(200).json({ profile: user });
     } catch {
-      res.status(400).json({
-        error: "error retrieving user",
+      return res.status(400).json({
+        error: "Something went wrong, try again",
       });
     }
   }
-  static async completeProfile(req,res){
+  static async completeProfile(req, res) {
     try {
-      const user = await User.findOne({_id:req.user.id})
-      if(!user){
-        res.status(400).json({error:"User doesn't exist"})
-      }
-      if(user.imageUrl != null && user.bio != null ){
-        res.status(400).json({error:"Your profile is already complete"})
-      }
-         const fileStr = req.body.img;
+      const fileStr = req.body.img;
       const uploadResponse = await cloudinary.uploader.upload(fileStr);
-    const  updatedUser =  await user.updateOne({$set:{
-           bio: req.body.bio,
-        imageUrl: uploadResponse.url,
-         }})
-        res.status(201).json({msg:"Profile completed successfuly" })
+      const updatedUser = await req.profile.updateOne({
+        $set: {
+          bio: req.body.bio,
+          imageUrl: uploadResponse.url,
+          isComplete: true,
+        },
+      });
+      return res.status(201).json({ msg: "Profile completed successfuly" });
     } catch (error) {
-      res.status(400).json({error:"Error occured", err: error})
+      return res
+        .status(400)
+        .json({ error: "Something went wrong", err: error });
     }
   }
   static async deleteAccount(req, res) {
     const user = await User.findOne({ email: req.user.email });
-    if (!user) return res.status(400).json({ error: "can't find user" });
+    if (!user) return res.status(404).json({ error: "User not found" });
     await user.delete();
-    res.status(201).json({ msg: "account deleted successfuly" });
+    return res.status(201).json({ msg: "Account deleted successfuly" });
   }
 }
 export default ProfileController;

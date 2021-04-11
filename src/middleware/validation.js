@@ -95,46 +95,55 @@ export const profileUpdateValidation = (req, res, next) => {
       .min(3)
       .max(12)
       .regex(/[a-zA-Z]/)
+      .required()
       .messages({
         "string.base": "Username must contain letters only ",
         "string.empty": "Please fill in your username",
         "string.min": "Username must be at least {#limit} characters long",
         "string.max": "Username must be below {#limit} characters long",
+        "any.required": "Username is required",
       }),
     bio: Joi.string()
       .min(10)
       .max(40)
       .regex(/[a-zA-Z]/)
+      .required()
       .messages({
         "string.base": "Bio must contain letters only ",
         "string.empty": "Please fill in your bio",
         "string.min": "Bio must be at least {#limit} characters long",
         "string.max": "Bio must be below {#limit} characters long",
+        "any.required": "Bio is required",
       }),
     firstName: Joi.string()
       .min(3)
       .max(12)
       .regex(/[a-zA-Z]/)
+      .required()
       .messages({
         "string.base": "First name must contain letters only ",
         "string.empty": "Please fill in your first name",
         "string.min": "Fisrt name must be at least {#limit} characters long",
         "string.max": "First name must be below {#limit} characters long",
+        "any.required": "Firstname is required",
       }),
     lastName: Joi.string()
       .min(3)
       .max(12)
       .regex(/[a-zA-Z]/)
+      .required()
       .messages({
         "string.base": "Last name must contain letters only ",
         "string.empty": "Please fill in your last name",
         "string.min": "Last name must be at least {#limit} characters long",
         "string.max": "Last name must be below {#limit} characters long",
+        "any.required": "Lastname is required",
       }),
 
-    imageUrl: Joi.string().uri().messages({
+    imageUrl: Joi.string().uri().required().messages({
       "string.base": "Url must be a link",
       "string.empty": "Image url is required",
+      "any.required": "Image is required",
     }),
   });
   const { error } = schema.validate(req.body);

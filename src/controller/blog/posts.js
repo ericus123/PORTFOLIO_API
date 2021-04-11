@@ -48,7 +48,7 @@ class PostController {
       );
       return res
         .status(201)
-        .json({ message: "post created succesfully", article: savedPost });
+        .json({ message: "Post created succesfully", article: savedPost });
     } catch (err) {
       res.status(500).json({ err: "Something went wrong", error: err });
     }
@@ -86,11 +86,9 @@ class PostController {
       //     limit: limit,
       //   };
       // }
-      const all = await Post.find({}).populate("category").sort({ date: -1 });
+      const all = await Post.find({}).sort({ date: -1 });
       results.maxPages = Math.ceil(all.length / limit);
-      results.results = await Post.find()
-        .populate("category")
-        .sort({ date: -1 })
+      results.results = await Post.find().sort({ date: -1 })
         .limit(limit)
         .skip(startIndex)
         .exec();
