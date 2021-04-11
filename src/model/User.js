@@ -43,9 +43,13 @@ const userSchema = new mongoose.Schema({
     default: "basic",
     enum: ["basic", "admin", "superAdmin"],
   },
-  imageUrl: {
+  avatar: {
     type: String,
     default: null,
+  },
+  avatar_public_id: {
+    type: String,
+    default: null
   },
   posts: [
     {

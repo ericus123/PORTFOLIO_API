@@ -66,10 +66,84 @@ export const userValidation = (req, res, next) => {
   next();
 };
 
+
+
+export const validateEmails = (req, res, next) => {
+  const schema = Joi.object({
+    message: Joi.string()
+      .min(10)
+      .required()
+      .messages({
+        "string.base": "Mesage must be a valid text ",
+        "string.empty": "Please add a message",
+        "string.min": "Message must be at least {#limit} characters long",
+        "any.required": "Message is required",
+      }),
+    emails: Joi.array().required().items(Joi.string().min(8).email().required().messages({
+      "string.base": "Email must be a string",
+      "string.email": "Invalid email",
+      "string.empty": "Please fill in your email",
+      "string.min": "Email must be at least {#limit} characters long",
+      "any.required": "Email is required",
+    })),
+    subject: Joi.string()
+      .min(10)
+      .max(100)
+      .required()
+      .messages({
+        "string.base": "Subject must be a valid text ",
+        "string.empty": "Please add a subject",
+        "string.min": "Subject must be at least {#limit} characters long",
+        "string.max": "Subject must be below {#limit} characters long",
+        "any.required": "Subject is required",
+      }),
+  })
+  const { error } = schema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+  next();
+}
+export const validateEmail = (req, res, next) => {
+  const schema = Joi.object({
+    message: Joi.string()
+      .min(10)
+      .required()
+      .messages({
+        "string.base": "Mesage must be a valid text ",
+        "string.empty": "Please add a message",
+        "string.min": "Message must be at least {#limit} characters long",
+        "any.required": "Message is required",
+      }),
+    email: Joi.string().min(8).email().required().messages({
+      "string.base": "Email must be a string",
+      "string.email": "Invalid email",
+      "string.empty": "Please fill in your email",
+      "string.min": "Email must be at least {#limit} characters long",
+      "any.required": "Email is required",
+    }),
+    subject: Joi.string()
+      .min(10)
+      .max(100)
+      .required()
+      .messages({
+        "string.base": "Subject must be a valid text ",
+        "string.empty": "Please add a subject",
+        "string.min": "Subject must be at least {#limit} characters long",
+        "string.max": "Subject must be below {#limit} characters long",
+        "any.required": "Subject is required",
+      }),
+  })
+  const { error } = schema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+  next();
+}
+
+
+
+
 export const completeProfileValidation = (req, res, next) => {
   const schema = Joi.object({
-    img: Joi.any().required().messages({
-      "any.empty": "Profile image is required",
+    img: Joi.string().required().messages({
+      "string.empty": "Profile image is required",
       "any.required": "Profile image is required",
     }),
     bio: Joi.string()
@@ -139,11 +213,9 @@ export const profileUpdateValidation = (req, res, next) => {
         "string.max": "Last name must be below {#limit} characters long",
         "any.required": "Lastname is required",
       }),
-
-    imageUrl: Joi.string().uri().required().messages({
-      "string.base": "Url must be a link",
-      "string.empty": "Image url is required",
-      "any.required": "Image is required",
+    img: Joi.string().required().messages({
+      "string.empty": "Profile image is required",
+      "any.required": "Profile image is required",
     }),
   });
   const { error } = schema.validate(req.body);
@@ -278,11 +350,10 @@ export const postValidation = (req, res, next) => {
       "string.empty": "Please fill in the category",
       "any.required": "Category is required",
     }),
-    imageUrl: Joi.string().uri().messages({
-      "string.base": "Url must be a link",
-      "string.empty": "Image url is required",
+    img: Joi.string().required().messages({
+      "string.empty": "Profile image is required",
+      "any.required": "Profile image is required",
     }),
-    img: Joi.any(),
   });
   const { error } = schema.validate(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });

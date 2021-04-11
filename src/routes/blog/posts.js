@@ -15,6 +15,7 @@ postRoute.post(
   AuthMiddleware.checkToken,
   AuthMiddleware.checkAdmin,
   postValidation,
+  PostsMiddleware.checkPostTitle,
   PostController.createPost
 );
 
@@ -56,6 +57,7 @@ postRoute.patch(
   AuthMiddleware.checkToken,
   AuthMiddleware.checkAdmin,
   postValidation,
+  PostsMiddleware.checkPostTitle,
   PostController.updatePost
 );
 postRoute.delete(

@@ -11,34 +11,29 @@ import dotenv from "dotenv";
 import CommentReplyLike from "../../model/CommentReplyLikes";
 import CommentReplyUnLike from "../../model/CommentReplyUnlikes";
 import BlogVideo from "../../model/BlogVideos";
-import paginate from "jw-paginate";
+import { uploadImage, deleteImage } from "../../helpers/images/index"
 
-var cloudinary = require("cloudinary").v2;
 dotenv.config();
 
-var uploads = {};
-
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 class PostController {
   static async createPost(req, res) {
     try {
-      const fileStr = req.body.img;
-      const uploadResponse = await cloudinary.uploader.upload(fileStr);
-      const category = await Category.findOne({ _id: req.body.category });
-      if (!category) {
+
+
+      const { title, description, category, img } = req.body;
+      const _category = await Category.findOne({ _id: category });
+      if (!_category) {
         return res.status(404).json({ error: "Category not found" });
       }
+      const uploaded_image = await uploadImage(img, "/Blog/Posts");
       const post = new Post({
-        title: req.body.title,
-        description: req.body.description,
+        title: req.title,
+        description: description,
         author: req.user.id,
-        category: req.body.category,
-        imageUrl: uploadResponse.url,
+        category: _category,
+        imageUrl: uploaded_image.secure_url,
+        image_public_id: uploaded_image.public_id
       });
       const savedPost = await post.save();
       await User.findByIdAndUpdate(
@@ -50,7 +45,7 @@ class PostController {
         .status(201)
         .json({ message: "Post created succesfully", article: savedPost });
     } catch (err) {
-      res.status(500).json({ err: "Something went wrong", error: err });
+      return res.status(500).json({ err: "Something went wrong", error: err });
     }
   }
   static async getPosts(req, res) {
@@ -78,14 +73,14 @@ class PostController {
       for (let i = 0; i < 2; i++) {
         if (startIndex > 0) {
           results.previous.push(page - 1);
+        } else {
+          results.previous = {
+            page: null,
+            limit: limit,
+          };
         }
       }
-      // else {
-      //   results.previous = {
-      //     page: null,
-      //     limit: limit,
-      //   };
-      // }
+
       const all = await Post.find({}).sort({ date: -1 });
       results.maxPages = Math.ceil(all.length / limit);
       results.results = await Post.find().sort({ date: -1 })
@@ -98,7 +93,7 @@ class PostController {
         postsPerPage: results,
         posts: all,
       });
-      next();
+
     } catch (error) {
       return res
         .status(500)
@@ -111,6 +106,7 @@ class PostController {
 
     try {
       const singlepost = await Post.findById(id).populate([
+        "category",
         {
           path: "comments",
           populate: {
@@ -133,13 +129,21 @@ class PostController {
     try {
       const post = await Post.findOne({ _id: id });
       if (!post) return res.status(400).json({ error: "Can't find post" });
+      const { description, category, img } = req.body;
+      const _category = await Category.findOne({ _id: category });
+      if (!_category) {
+        return res.status(404).json({ error: "Category not found" });
+      }
+      const uploaded_image = await uploadImage(img, "/Blog/Posts");
+      await deleteImage(post.image_public_id)
       await post.updateOne({
         $set: {
-          title: req.body.title,
-          description: req.body.description,
-          category: req.body.category,
-          imageUrl: req.body.url,
+          title: req.title,
+          description: description,
+          category: category,
+          imageUrl: uploaded_image.secure_url,
           updatedBy: req.user.id,
+          image_public_id: uploaded_image.public_id,
           updatedAt: Date.now(),
         },
       });
@@ -147,8 +151,8 @@ class PostController {
       return res
         .status(201)
         .json({ message: "Post updated successfully", post: updatedPost });
-    } catch {
-      res.status(400).json({ error: "Can't update post" });
+    } catch(error) {
+      return res.status(400).json({ error: "Something went wrong", err: error });
     }
   }
 
@@ -157,9 +161,10 @@ class PostController {
       const post = await Post.findOne({ _id: req.params.id });
       if (!post) return res.status(400).json({ error: "Can't find the post" });
       await post.deleteOne();
-      res.status(201).json({ message: "Post deleted successfully !" });
+      await deleteImage(post.image_public_id);
+      return res.status(201).json({ message: "Post deleted successfully !" });
     } catch (err) {
-      res.status(400).json({ error: "Can't delete post", post: post });
+      return res.status(400).json({ error: "Can't delete post", post: post });
     }
   }
   static async getPostsByCategory(req, res) {
@@ -268,9 +273,9 @@ class PostController {
       );
 
       const post = await Post.findById(req.params.postId).populate("comments");
-      res.status(201).json({ msg: "Comment saved!", comment: savedComment });
+      return res.status(201).json({ msg: "Comment saved!", comment: savedComment });
     } catch (error) {
-      res.status(400).json({ error: "Failed to create comment", err: error });
+      return res.status(400).json({ error: "Failed to create comment", err: error });
     }
   }
   static async deleteComment(req, res) {
@@ -279,9 +284,9 @@ class PostController {
         { _id: req.params.commentId },
         { useFindAndModify: false }
       );
-      res.status(201).json({ msg: "Deleted comment" });
+      return res.status(201).json({ msg: "Deleted comment" });
     } catch (error) {
-      res.status(400).json({ error: "Error occured" });
+      return res.status(400).json({ error: "Error occured" });
     }
   }
   static async editComment(req, res) {
@@ -314,9 +319,9 @@ class PostController {
           description: req.body.description,
         },
       });
-      res.status(201).json({ msg: "Edited reply" });
+      return res.status(201).json({ msg: "Edited reply" });
     } catch (error) {
-      res.status(400).json({ error: "Error occured" });
+      return res.status(400).json({ error: "Error occured" });
     }
   }
 
@@ -336,13 +341,13 @@ class PostController {
         { $push: { replies: savedReply._id } },
         { new: true, useFindAndModify: false }
       );
-      res.status(201).json({
+      return res.status(201).json({
         msg: "Reply saved!",
         reply: savedReply,
         commentId: req.params.commentId,
       });
     } catch (error) {
-      res.status(400).json({
+      return res.status(400).json({
         error: "Failed to reply",
         err: error,
         commentId: req.params.commentId,
@@ -355,9 +360,9 @@ class PostController {
         { _id: req.params.commentReplyId },
         { useFindAndModify: false }
       );
-      res.status(201).json({ msg: "Deleted reply" });
+      return res.status(201).json({ msg: "Deleted reply" });
     } catch (error) {
-      res.status(400).json({ error: "Error occured" });
+      return res.status(400).json({ error: "Error occured" });
     }
   }
   static async editCommentReply(req, res) {
@@ -371,9 +376,9 @@ class PostController {
         },
         { useFindAndModify: false }
       );
-      res.status(201).json({ msg: "Edited reply" });
+      return res.status(201).json({ msg: "Edited reply" });
     } catch (error) {
-      res.status(400).json({ error: "Error occured" });
+      return res.status(400).json({ error: "Error occured" });
     }
   }
   static async reactToThePostComment(req, res) {
@@ -398,7 +403,7 @@ class PostController {
           { new: true, useFindAndModify: false }
         );
 
-        res.status(201).json({
+        return res.status(201).json({
           msg: "liked!",
           like: savedLike,
         });
@@ -413,7 +418,7 @@ class PostController {
           { new: true, useFindAndModify: false }
         );
 
-        res.status(201).json({
+        return res.status(201).json({
           msg: "unliked!",
           unlike: savedUnLike,
         });
@@ -442,12 +447,12 @@ class PostController {
           saveUnlike();
         }
       } else {
-        res.status(400).json({
+        return res.status(400).json({
           error: `reaction can't be ${action}`,
         });
       }
     } catch (error) {
-      res.status(400).json({ error: `Failed to ${action} `, err: error });
+      return res.status(400).json({ error: `Failed to ${action} `, err: error });
     }
   }
 
@@ -476,7 +481,7 @@ class PostController {
           { new: true, useFindAndModify: false }
         );
 
-        res.status(201).json({
+        return res.status(201).json({
           msg: "liked!",
           like: savedLike,
         });
@@ -491,7 +496,7 @@ class PostController {
           { new: true, useFindAndModify: false }
         );
 
-        res.status(201).json({
+        return res.status(201).json({
           msg: "unliked!",
           unlike: savedUnLike,
         });
@@ -522,12 +527,12 @@ class PostController {
           saveUnlike();
         }
       } else {
-        res.status(400).json({
+        return res.status(400).json({
           error: `reaction can't be ${action}`,
         });
       }
     } catch (error) {
-      res.status(400).json({ error: `Failed to ${action} `, err: error });
+      return res.status(400).json({ error: `Failed to ${action} `, err: error });
     }
   }
   static async reactToThePost(req, res) {
@@ -552,7 +557,7 @@ class PostController {
           { new: true, useFindAndModify: false }
         );
 
-        res.status(201).json({
+        return res.status(201).json({
           msg: "liked!",
           like: savedLike,
         });
@@ -567,7 +572,7 @@ class PostController {
           { new: true, useFindAndModify: false }
         );
 
-        res.status(201).json({
+        return res.status(201).json({
           msg: "unliked!",
           unlike: savedUnLike,
         });
@@ -601,7 +606,7 @@ class PostController {
         });
       }
     } catch (error) {
-      res
+      return res
         .status(400)
         .json({ error: `Failed to ${req.params.action} `, err: error });
     }
@@ -623,12 +628,12 @@ class PostController {
         },
       ]);
 
-      res.status(200).json({
+      return res.status(200).json({
         msg: "Search results retrieved successfuly",
         posts: posts,
       });
     } catch (error) {
-      res.status(400).json({ error: "Error occurred", err: error });
+      return res.status(400).json({ error: "Error occurred", err: error });
     }
   }
   static async createBlogVideo(req, res) {
@@ -639,19 +644,19 @@ class PostController {
         description: req.body.description,
       });
       const saveVideo = await video.save();
-      res.status(201).json({ msg: "Video added succesfuly", video: saveVideo });
+      return res.status(201).json({ msg: "Video added succesfuly", video: saveVideo });
     } catch (error) {
-      res.status(400).json({ error: "Something went wrong", err: error });
+      return res.status(400).json({ error: "Something went wrong", err: error });
     }
   }
   static async getBlogVideos(req, res) {
     try {
       const videos = await BlogVideo.find({}).populate("author");
-      res
+      return res
         .status(200)
         .json({ msg: "Videos fetched successfuly", videos: videos });
     } catch (error) {
-      res.status(400).json({ error: "Something went wrong", err: error });
+      return res.status(400).json({ error: "Something went wrong", err: error });
     }
   }
   static async updateBlogVideo(req, res) {
@@ -659,7 +664,7 @@ class PostController {
       const video = await BlogVideo.findById(req.params.id);
       console.log(video);
       if (!video) {
-        res.status(404).json({ error: "Video not found" });
+        return res.status(404).json({ error: "Video not found" });
       }
       await video.updateOne({
         $set: {
@@ -668,9 +673,9 @@ class PostController {
           description: req.body.description,
         },
       });
-      res.status(201).json({ msg: "Video updated successfuly", video: video });
+      return res.status(201).json({ msg: "Video updated successfuly", video: video });
     } catch (error) {
-      res.status(400).json({ error: "Something went wrong", err: error });
+      return res.status(400).json({ error: "Something went wrong", err: error });
     }
   }
 }

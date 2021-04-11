@@ -11,7 +11,7 @@ profileRoute.put(
   "/",
   AuthMiddleware.checkToken,
   profileUpdateValidation,
-  ProfileController.updateUser
+  ProfileController.updateProfile
 );
 profileRoute.get("/", AuthMiddleware.checkToken, ProfileController.viewProfile);
 profileRoute.delete(

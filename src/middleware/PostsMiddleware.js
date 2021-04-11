@@ -2,6 +2,7 @@ import Post from "../model/Post";
 import Comment from "../model/Comments";
 import Category from "../model/Category";
 import CommentReply from "../model/CommentReplies";
+import crypto from "crypto";
 
 class PostsMiddleware {
   static async checkPostComment(req, res, next) {
@@ -42,13 +43,22 @@ class PostsMiddleware {
   static async checkCategoryUpdate(req, res, next) {
     const category = await Category.findOne({ _id: req.params.category });
     if (!category) return res.status(404).json({ error: "Category not found" });
-    next(); 
+    next();
   }
   static async checkCatCreation(req, res, next) {
-    const category = await Category.findOne({name:req.body.name});
+    const category = await Category.findOne({ name: req.body.name });
     if (category) {
       return res.status(400).json({ error: "Category name already exist" });
     }
+    next();
+  }
+  static async checkPostTitle(req, res, next) {
+    let { title } = req.body;
+    const post = await Post.findOne({ title: title });
+    if (post) {
+      title = title.concat("-" + crypto.randomBytes(1).toString("hex"));
+    }
+    req.title = title;
     next();
   }
 }

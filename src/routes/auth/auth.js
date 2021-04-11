@@ -3,11 +3,11 @@ const authRoute = new Router();
 import {
   userValidation,
   loginValidation,
-  PassResetEmailValidation,
   PassResetValidation,
 } from "../../middleware/validation";
 import AuthController from "../../controller/auth/auth";
 import AuthMiddleware from "../../middleware/AuthMiddleware";
+import NewsLetterMiddleware from "../../middleware/subscriptions/newsLetter";
 
 authRoute.post("/register", userValidation, AuthController.Signup);
 authRoute.post("/login", loginValidation, AuthController.Login);
@@ -17,22 +17,27 @@ authRoute.post(
   AuthController.CheckLogin
 );
 authRoute.put(
-  "/verify/:id/:token",
+  "/verify/:email/:token",
+  NewsLetterMiddleware.checkEmail,
   AuthMiddleware.isNotVerified,
   AuthController.ConfEmail
 );
 authRoute.post(
-  "/confirmation/resend/:id",
+  "/confirmation/resend/:email",
+  NewsLetterMiddleware.checkEmail,
   AuthMiddleware.isNotVerified,
   AuthController.ResendConfEmail
 );
 authRoute.post(
   "/password/resetlink",
-  PassResetEmailValidation,
+  NewsLetterMiddleware.checkEmail,
+  AuthMiddleware.isVerified,
   AuthController.SendPassResetLink
 );
 authRoute.put(
-  "/password/reset/:id/:token",
+  "/password/reset/:email/:token",
+  NewsLetterMiddleware.checkEmail,
+  AuthMiddleware.isVerified,
   PassResetValidation,
   AuthController.ResetPassword
 );

@@ -5,6 +5,7 @@ import userRoute from "./routes/users/users";
 import profileRoute from "./routes/profile/profile";
 import roleRoute from "./routes/roles/roles";
 import authRoute from "./routes/auth/auth";
+import emailRoute from "./routes/emails/emails";
 import postRoute from "./routes/blog/posts";
 import newsLetterRoute from "./routes/subscriptions/newsLetter";
 import blogVideosRoute from "./routes/blog/videos";
@@ -61,13 +62,14 @@ app.use("/api/profile", profileRoute);
 app.use("/api/subscriptions/newsletter", newsLetterRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/blog", blogVideosRoute);
+app.use("/api/emails", emailRoute);
 app.use("/api/messages", messageRoute);
 app.use("/", (req, res) => {
   res.status(200).json({ message: "Hello ! Welcome on our website " });
 });
-// app.use((req, res, next) => {
-//   res.status(404).json({ error: "wrong route" });
-//   next();
-// });
+app.use((req, res, next) => {
+  res.status(404).json({ error: "wrong route" });
+  next();
+});
 
 export default app;

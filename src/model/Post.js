@@ -23,6 +23,10 @@ const postSchema = new mongoose.Schema({
   imageUrl: {
     type: String,
   },
+  image_public_id: {
+    type: String,
+    default: null
+  },
   comments: [
     {
       type: mongoose.Schema.Types.ObjectId,
