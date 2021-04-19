@@ -20,9 +20,17 @@ postRoute.post(
 );
 
 postRoute.post(
-  "/:postId/react/:action",
+  "/:postId/react",
   AuthMiddleware.checkToken,
+  PostsMiddleware.postExist,
   PostController.reactToThePost
+);
+
+postRoute.get(
+  "/reactions/:postId",
+  AuthMiddleware.checkToken,
+  PostsMiddleware.postExist,
+  PostController.getPostReactions
 );
 postRoute.get("/", PostController.getPosts);
 postRoute.get("/categories", PostController.getPostCats);
@@ -67,23 +75,10 @@ postRoute.delete(
   PostController.deletePost
 );
 
-//likes
-postRoute.patch(
-  "/:postId/:action",
+postRoute.post(
+  "/replies/:replyId/react",
   AuthMiddleware.checkToken,
-  PostsMiddleware.checkPostReaction,
-  PostController.reactToThePost
-);
-postRoute.patch(
-  "/:postId/:commentId/:action",
-  AuthMiddleware.checkToken,
-  PostsMiddleware.checkPostComment,
-  PostController.reactToThePostComment
-);
-postRoute.patch(
-  "/:postId/:commentId/:replyId/:action",
-  AuthMiddleware.checkToken,
-  PostsMiddleware.checkPostComment,
+  PostsMiddleware.replyExist,
   PostController.reactToThePostCommentReply
 );
 
@@ -108,13 +103,18 @@ postRoute.patch(
   postCommentValidation,
   PostController.editComment
 );
-
+postRoute.patch(
+  "/comments/:commentId/react",
+  AuthMiddleware.checkToken,
+  PostsMiddleware.commentExist,
+  PostController.reactToThePostComment
+);
 //comment replies
 
 postRoute.post(
-  "/:postId/:commentId/reply",
+  "/replies/:commentId",
   AuthMiddleware.checkToken,
-  PostsMiddleware.checkPostComment,
+  PostsMiddleware.commentExist,
   postCommentReplyValidation,
   PostController.postCommentReply
 );

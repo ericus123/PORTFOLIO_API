@@ -1,15 +1,12 @@
 import Post from "../../model/Post";
 import Comment from "../../model/Comments";
 import CommentReply from "../../model/CommentReplies";
-import CommentLike from "../../model/CommentLikes";
-import CommentUnlike from "../../model/CommentUnlikes";
+import CommentReaction from "../../model/CommentReactions";
 import User from "../../model/User";
-import Like from "../../model/PostLikes";
-import unLike from "../../model/PostUnLikes";
+import PostReaction from "../../model/PostReactions";
 import Category from "../../model/Category";
 import dotenv from "dotenv";
-import CommentReplyLike from "../../model/CommentReplyLikes";
-import CommentReplyUnLike from "../../model/CommentReplyUnlikes";
+import ReplyReaction from "../../model/CommentReplyReactions";
 import BlogVideo from "../../model/BlogVideos";
 import { uploadImage, deleteImage } from "../../helpers/images/index"
 
@@ -19,8 +16,6 @@ dotenv.config();
 class PostController {
   static async createPost(req, res) {
     try {
-
-
       const { title, description, category, img } = req.body;
       const _category = await Category.findOne({ _id: category });
       if (!_category) {
@@ -151,7 +146,7 @@ class PostController {
       return res
         .status(201)
         .json({ message: "Post updated successfully", post: updatedPost });
-    } catch(error) {
+    } catch (error) {
       return res.status(400).json({ error: "Something went wrong", err: error });
     }
   }
@@ -256,10 +251,10 @@ class PostController {
   }
 
   static async postComment(req, res) {
-    const user = await User.findById(req.user.id);
+    const { description } = req.body;
     const comment = new Comment({
-      description: req.body.description,
-      user: user,
+      description: description,
+      user: req.user.id,
     });
 
     try {
@@ -382,233 +377,163 @@ class PostController {
     }
   }
   static async reactToThePostComment(req, res) {
-    const user = await User.findById(req.user.id);
-    const like = new CommentLike({
-      user: user,
-      userId: req.user.id,
-    });
-    const unlike = new CommentUnlike({
-      user: user,
-      userId: req.user.id,
-    });
 
     try {
-      const action = req.params.action;
-      const saveLike = async () => {
-        const savedLike = await like.save();
-        const id = savedLike._id;
-        const savedComment = await Comment.findByIdAndUpdate(
-          req.params.commentId,
-          { $push: { likes: savedLike._id } },
-          { new: true, useFindAndModify: false }
-        );
-
-        return res.status(201).json({
-          msg: "liked!",
-          like: savedLike,
-        });
-      };
-      const saveUnlike = async () => {
-        const savedUnLike = await unlike.save();
-        const id = savedUnLike._id;
-
-        await Comment.findByIdAndUpdate(
-          req.params.commentId,
-          { $push: { unLikes: savedUnLike._id } },
-          { new: true, useFindAndModify: false }
-        );
-
-        return res.status(201).json({
-          msg: "unliked!",
-          unlike: savedUnLike,
-        });
-      };
-      const hasLiked = await CommentLike.findOne({ userId: req.user.id });
-      const hasUnLiked = await CommentUnlike.findOne({ userId: req.user.id });
-
-      if (action == "like") {
-        if (hasLiked) {
-          await CommentLike.deleteOne({ userId: req.user.id });
-          return res.status(201).json({ msg: "Removed like" });
-        } else if (hasUnLiked) {
-          await CommentUnlike.deleteOne({ userId: req.user.id });
-          saveLike();
-        } else {
-          saveLike();
-        }
-      } else if (action == "unlike") {
-        if (hasLiked) {
-          await CommentLike.deleteOne({ userId: req.user.id });
-          saveUnlike();
-        } else if (hasUnLiked) {
-          await CommentUnlike.deleteOne({ userId: req.user.id });
-          return res.status(201).json({ msg: "Removed unlike" });
-        } else {
-          saveUnlike();
-        }
-      } else {
-        return res.status(400).json({
-          error: `reaction can't be ${action}`,
-        });
+      const { commentId } = req.params;
+      const hasLiked = await CommentReaction.findOne({ commentId: commentId, user: req.user.id });
+      if (hasLiked) {
+        await hasLiked.delete();
+        return res.status(201).json({ msg: "Unliked" });
       }
+      const like = new CommentReaction({
+        user: req.user.id,
+        commentId: commentId,
+      });
+      const savedLike = await like.save();
+      await Comment.findByIdAndUpdate(
+        req.params.commentId,
+        { $push: { likes: savedLike._id } },
+        { new: true, useFindAndModify: false }
+      );
+      return res.status(201).json({ msg: "Liked", like: savedLike });
     } catch (error) {
-      return res.status(400).json({ error: `Failed to ${action} `, err: error });
+      return res.status(400).json({ error: "Something went wrong", err: error });
     }
   }
 
   static async reactToThePostCommentReply(req, res) {
-    const commentReply = await CommentReply.findById(req.params.replyId);
-    if (!commentReply)
-      return res.status(404).json({ error: "Reply not found" });
-    const user = await User.findById(req.user.id);
-    const like = new CommentReplyLike({
-      user: user,
-      userId: req.user.id,
-    });
-    const unlike = new CommentReplyUnLike({
-      user: user,
-      userId: req.user.id,
-    });
-
     try {
-      const action = req.params.action;
-      const saveLike = async () => {
-        const savedLike = await like.save();
-        const id = savedLike._id;
-        const savedComment = await CommentReply.findByIdAndUpdate(
-          req.params.replyId,
-          { $push: { likes: savedLike._id } },
-          { new: true, useFindAndModify: false }
-        );
-
-        return res.status(201).json({
-          msg: "liked!",
-          like: savedLike,
-        });
-      };
-      const saveUnlike = async () => {
-        const savedUnLike = await unlike.save();
-        const id = savedUnLike._id;
-
-        await CommentReply.findByIdAndUpdate(
-          req.params.replyId,
-          { $push: { unLikes: savedUnLike._id } },
-          { new: true, useFindAndModify: false }
-        );
-
-        return res.status(201).json({
-          msg: "unliked!",
-          unlike: savedUnLike,
-        });
-      };
-      const hasLiked = await CommentReplyLike.findOne({ userId: req.user.id });
-      const hasUnLiked = await CommentReplyUnLike.findOne({
-        userId: req.user.id,
-      });
-
-      if (action == "like") {
-        if (hasLiked) {
-          await CommentReplyLike.deleteOne({ userId: req.user.id });
-          return res.status(201).json({ msg: "Removed like" });
-        } else if (hasUnLiked) {
-          await CommentReplyUnLike.deleteOne({ userId: req.user.id });
-          saveLike();
-        } else {
-          saveLike();
-        }
-      } else if (action == "unlike") {
-        if (hasLiked) {
-          await CommentReplyUnLike.deleteOne({ userId: req.user.id });
-          saveUnlike();
-        } else if (hasUnLiked) {
-          await CommentReplyUnLike.deleteOne({ userId: req.user.id });
-          return res.status(201).json({ msg: "Removed unlike" });
-        } else {
-          saveUnlike();
-        }
-      } else {
-        return res.status(400).json({
-          error: `reaction can't be ${action}`,
-        });
+      const { replyId } = req.params;
+      const hasLiked = await ReplyReaction.findOne({ replyId: replyId, user: req.user.id });
+      if (hasLiked) {
+        await hasLiked.delete();
+        return res.status(201).json({ msg: "Unliked" });
       }
+      const like = new ReplyReaction({
+        user: req.user.id,
+        replyId: replyId,
+      });
+      const savedLike = await like.save();
+      await CommentReply.findByIdAndUpdate(
+        req.params.replyId,
+        { $push: { likes: savedLike._id } },
+        { new: true, useFindAndModify: false }
+      );
+      return res.status(201).json({ msg: "Liked", like: savedLike });
     } catch (error) {
-      return res.status(400).json({ error: `Failed to ${action} `, err: error });
+      return res.status(400).json({ error: "Something went wrong", err: error });
     }
+    // const commentReply = await CommentReply.findById(req.params.replyId);
+    // if (!commentReply)
+    //   return res.status(404).json({ error: "Reply not found" });
+    // const user = await User.findById(req.user.id);
+    // const like = new CommentReplyLike({
+    //   user: user,
+    //   userId: req.user.id,
+    // });
+    // const unlike = new CommentReplyUnLike({
+    //   user: user,
+    //   userId: req.user.id,
+    // });
+
+    // try {
+    //   const action = req.params.action;
+    //   const saveLike = async () => {
+    //     const savedLike = await like.save();
+    //     const id = savedLike._id;
+    //     const savedComment = await CommentReply.findByIdAndUpdate(
+    //       req.params.replyId,
+    //       { $push: { likes: savedLike._id } },
+    //       { new: true, useFindAndModify: false }
+    //     );
+
+    //     return res.status(201).json({
+    //       msg: "liked!",
+    //       like: savedLike,
+    //     });
+    //   };
+    //   const saveUnlike = async () => {
+    //     const savedUnLike = await unlike.save();
+    //     const id = savedUnLike._id;
+
+    //     await CommentReply.findByIdAndUpdate(
+    //       req.params.replyId,
+    //       { $push: { unLikes: savedUnLike._id } },
+    //       { new: true, useFindAndModify: false }
+    //     );
+
+    //     return res.status(201).json({
+    //       msg: "unliked!",
+    //       unlike: savedUnLike,
+    //     });
+    //   };
+    //   const hasLiked = await CommentReplyLike.findOne({ userId: req.user.id });
+    //   const hasUnLiked = await CommentReplyUnLike.findOne({
+    //     userId: req.user.id,
+    //   });
+
+    //   if (action == "like") {
+    //     if (hasLiked) {
+    //       await CommentReplyLike.deleteOne({ userId: req.user.id });
+    //       return res.status(201).json({ msg: "Removed like" });
+    //     } else if (hasUnLiked) {
+    //       await CommentReplyUnLike.deleteOne({ userId: req.user.id });
+    //       saveLike();
+    //     } else {
+    //       saveLike();
+    //     }
+    //   } else if (action == "unlike") {
+    //     if (hasLiked) {
+    //       await CommentReplyUnLike.deleteOne({ userId: req.user.id });
+    //       saveUnlike();
+    //     } else if (hasUnLiked) {
+    //       await CommentReplyUnLike.deleteOne({ userId: req.user.id });
+    //       return res.status(201).json({ msg: "Removed unlike" });
+    //     } else {
+    //       saveUnlike();
+    //     }
+    //   } else {
+    //     return res.status(400).json({
+    //       error: `reaction can't be ${action}`,
+    //     });
+    //   }
+    // } catch (error) {
+    //   return res.status(400).json({ error: `Failed to ${action} `, err: error });
+    // }
   }
   static async reactToThePost(req, res) {
-    const user = await User.findById(req.user.id);
-    const like = new Like({
-      user: user,
-      userId: req.user.id,
-    });
-    const unlike = new unLike({
-      user: user,
-      userId: req.user.id,
-    });
 
     try {
-      const action = req.params.action;
-      const saveLike = async () => {
-        const savedLike = await like.save();
-        const id = savedLike._id;
-        const savedPost = await Post.findByIdAndUpdate(
-          req.params.postId,
-          { $push: { likes: savedLike._id } },
-          { new: true, useFindAndModify: false }
-        );
-
-        return res.status(201).json({
-          msg: "liked!",
-          like: savedLike,
-        });
-      };
-      const saveUnlike = async () => {
-        const savedUnLike = await unlike.save();
-        const id = savedUnLike._id;
-
-        await Post.findByIdAndUpdate(
-          req.params.postId,
-          { $push: { unLikes: savedUnLike._id } },
-          { new: true, useFindAndModify: false }
-        );
-
-        return res.status(201).json({
-          msg: "unliked!",
-          unlike: savedUnLike,
-        });
-      };
-      const hasLiked = await Like.findOne({ userId: req.user.id });
-      const hasUnLiked = await unLike.findOne({ userId: req.user.id });
-
-      if (action == "like") {
-        if (hasLiked) {
-          await Like.deleteOne({ userId: req.user.id });
-          return res.status(201).json({ msg: "Removed like" });
-        } else if (hasUnLiked) {
-          await unLike.deleteOne({ userId: req.user.id });
-          saveLike();
-        } else {
-          saveLike();
-        }
-      } else if (action == "unlike") {
-        if (hasLiked) {
-          await Like.deleteOne({ userId: req.user.id });
-          saveUnlike();
-        } else if (hasUnLiked) {
-          await unLike.deleteOne({ userId: req.user.id });
-          return res.status(201).json({ msg: "Removed unlike" });
-        } else {
-          saveUnlike();
-        }
-      } else {
-        return res.status(400).json({
-          error: `reaction can't be ${action}`,
-        });
+      const hasLiked = await PostReaction.findOne({ user: req.user.id });
+      if (hasLiked) {
+        await hasLiked.delete();
+        return res.status(201).json({ msg: "Unliked" });
       }
+      const like = new PostReaction({
+        user: req.user.id,
+        postId: req.params.postId
+      });
+      const savedLike = await like.save();
+      await Post.findByIdAndUpdate(
+        req.params.postId,
+        { $push: { likes: savedLike._id } },
+        { new: true, useFindAndModify: false }
+      );
+      return res.status(201).json({ msg: "Liked", like: savedLike });
+
     } catch (error) {
       return res
         .status(400)
-        .json({ error: `Failed to ${req.params.action} `, err: error });
+        .json({ error: "Something went wrong", err: error });
+    }
+  }
+  static async getPostReactions(req, res) {
+    try {
+      const { postId } = req.params;
+      const likes = await PostReaction.find({ postId: postId });
+      return res.status(200).json({ msg: "Likes fetched successfully", likes: likes })
+    } catch (error) {
+      return res.status(500).json({ error: "Something went wrong", err: error })
     }
   }
   static async searchPosts(req, res) {
