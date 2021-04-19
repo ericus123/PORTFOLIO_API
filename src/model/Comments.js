@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 const commentSchema = new mongoose.Schema({
-  user: {},
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+  },
   description: {
     type: String,
   },
@@ -13,19 +16,9 @@ const commentSchema = new mongoose.Schema({
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "CommentLikes",
+      ref: "CommentReactions",
     },
   ],
-  unLikes: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "CommentUnLikes",
-    },
-  ],
-  date: {
-    type: Date,
-    default: Date.now,
-  },
 });
 
 export default mongoose.model("Comments", commentSchema);

@@ -7,13 +7,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
-
-var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
-
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
 var _User = _interopRequireDefault(require("../../model/User"));
 
@@ -29,61 +29,11 @@ var _dotenv = _interopRequireDefault(require("dotenv"));
 
 var _crypto = _interopRequireDefault(require("crypto"));
 
-var _emailTemplates = require("../../helpers/emailTemplates");
+var _emails = require("../../helpers/emails");
 
-var _nodemailer = _interopRequireDefault(require("nodemailer"));
-
-var _require = require("googleapis"),
-    google = _require.google;
-
-var OAuth2 = google.auth.OAuth2;
+var _templates = require("../../helpers/emails/templates");
 
 _dotenv["default"].config();
-
-var oAuth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, process.env.GOOGLE_CLIENT_REDIRECT_URI);
-oAuth2Client.setCredentials({
-  refresh_token: process.env.GOOGLE_CLIENT_REFRESH_TOKEN
-});
-var accessToken;
-
-var setAccessToken = /*#__PURE__*/function () {
-  var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee() {
-    return _regenerator["default"].wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            _context.next = 2;
-            return oAuth2Client.getAccessToken();
-
-          case 2:
-            accessToken = _context.sent;
-
-          case 3:
-          case "end":
-            return _context.stop();
-        }
-      }
-    }, _callee);
-  }));
-
-  return function setAccessToken() {
-    return _ref.apply(this, arguments);
-  };
-}();
-
-setAccessToken();
-
-var transport = _nodemailer["default"].createTransport({
-  service: "gmail",
-  auth: {
-    type: "OAuth2",
-    user: process.env.Email,
-    clientId: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    refreshToken: process.env.GOOGLE_CLIENT_REFRESH_TOKEN,
-    accessToken: accessToken
-  }
-});
 
 var AuthController = /*#__PURE__*/function () {
   function AuthController() {
@@ -93,71 +43,71 @@ var AuthController = /*#__PURE__*/function () {
   (0, _createClass2["default"])(AuthController, null, [{
     key: "Login",
     value: function () {
-      var _Login = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(req, res) {
+      var _Login = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(req, res) {
         var user, validPass, login, token;
-        return _regenerator["default"].wrap(function _callee2$(_context2) {
+        return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context.prev = _context.next) {
               case 0:
-                _context2.next = 2;
+                _context.next = 2;
                 return _User["default"].findOne({
                   email: req.body.email
                 });
 
               case 2:
-                user = _context2.sent;
+                user = _context.sent;
 
                 if (user) {
-                  _context2.next = 5;
+                  _context.next = 5;
                   break;
                 }
 
-                return _context2.abrupt("return", res.status(400).json({
+                return _context.abrupt("return", res.status(400).json({
                   error: "Incorrect credentials"
                 }));
 
               case 5:
-                _context2.next = 7;
+                _context.next = 7;
                 return _bcryptjs["default"].compare(req.body.password, user.password);
 
               case 7:
-                validPass = _context2.sent;
+                validPass = _context.sent;
 
                 if (validPass) {
-                  _context2.next = 10;
+                  _context.next = 10;
                   break;
                 }
 
-                return _context2.abrupt("return", res.status(400).json({
+                return _context.abrupt("return", res.status(400).json({
                   error: "Incorrect credentials"
                 }));
 
               case 10:
-                _context2.next = 12;
+                _context.next = 12;
                 return _User["default"].findOne({
                   email: req.body.email,
                   password: user.password
                 });
 
               case 12:
-                login = _context2.sent;
+                login = _context.sent;
 
                 if (login) {
-                  _context2.next = 15;
+                  _context.next = 15;
                   break;
                 }
 
-                return _context2.abrupt("return", res.status(400).json({
+                return _context.abrupt("return", res.status(400).json({
                   error: "Incorrect credentials"
                 }));
 
               case 15:
                 if (user.isVerified) {
-                  _context2.next = 17;
+                  _context.next = 17;
                   break;
                 }
 
-                return _context2.abrupt("return", res.status(400).json({
+                return _context.abrupt("return", res.status(400).json({
                   error: "Your account has not been verified"
                 }));
 
@@ -170,21 +120,21 @@ var AuthController = /*#__PURE__*/function () {
                   email: login.email,
                   firstName: login.firstName,
                   lastName: login.lastName,
-                  imageUrl: login.imageUrl
+                  avatar: login.avatar
                 }, process.env.TOKEN_SECRET, {
                   expiresIn: "1d"
                 });
-                return _context2.abrupt("return", res.status(200).json({
+                return _context.abrupt("return", res.status(200).json({
                   msg: "logged in successfuly",
                   token: token
                 }));
 
               case 19:
               case "end":
-                return _context2.stop();
+                return _context.stop();
             }
           }
-        }, _callee2);
+        }, _callee);
       }));
 
       function Login(_x, _x2) {
@@ -196,53 +146,53 @@ var AuthController = /*#__PURE__*/function () {
   }, {
     key: "Signup",
     value: function () {
-      var _Signup = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(req, res) {
-        var _req$body, username, firstName, lastName, email, password, emailExists, salt, hashedPassword, user, token, url, ConfEmailOptions;
+      var _Signup = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(req, res) {
+        var _req$body, username, firstName, lastName, email, password, emailExists, salt, hashedPassword, user, token, url, name;
 
-        return _regenerator["default"].wrap(function _callee4$(_context4) {
+        return _regenerator["default"].wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
                 if (!(req.body.confPassword != req.body.password)) {
-                  _context4.next = 2;
+                  _context2.next = 2;
                   break;
                 }
 
-                return _context4.abrupt("return", res.status(400).json({
+                return _context2.abrupt("return", res.status(400).json({
                   error: "Passwords do not match"
                 }));
 
               case 2:
-                _context4.prev = 2;
+                _context2.prev = 2;
                 _req$body = req.body, username = _req$body.username, firstName = _req$body.firstName, lastName = _req$body.lastName, email = _req$body.email, password = _req$body.password;
-                _context4.next = 6;
+                _context2.next = 6;
                 return _User["default"].findOne({
                   email: req.body.email
                 });
 
               case 6:
-                emailExists = _context4.sent;
+                emailExists = _context2.sent;
 
                 if (!emailExists) {
-                  _context4.next = 9;
+                  _context2.next = 9;
                   break;
                 }
 
-                return _context4.abrupt("return", res.status(400).json({
+                return _context2.abrupt("return", res.status(400).json({
                   error: "Email already exists"
                 }));
 
               case 9:
-                _context4.next = 11;
+                _context2.next = 11;
                 return _bcryptjs["default"].genSalt(10);
 
               case 11:
-                salt = _context4.sent;
-                _context4.next = 14;
+                salt = _context2.sent;
+                _context2.next = 14;
                 return _bcryptjs["default"].hash(password, salt);
 
               case 14:
-                hashedPassword = _context4.sent;
+                hashedPassword = _context2.sent;
                 user = new _User["default"]({
                   username: username,
                   firstName: firstName,
@@ -250,7 +200,7 @@ var AuthController = /*#__PURE__*/function () {
                   email: email,
                   password: hashedPassword
                 });
-                _context4.next = 18;
+                _context2.next = 18;
                 return user.save();
 
               case 18:
@@ -258,80 +208,48 @@ var AuthController = /*#__PURE__*/function () {
                   _userId: user._id,
                   token: _crypto["default"].randomBytes(16).toString("hex")
                 });
-                _context4.next = 21;
+                _context2.next = 21;
                 return token.save();
 
               case 21:
                 url = "".concat(process.env.FRONTEND_URL, "/account/verify/").concat(user._id, "/").concat(token.token);
-                ConfEmailOptions = {
-                  from: process.env.Email,
-                  to: user.email,
-                  subject: "Confirm Email",
-                  html: (0, _emailTemplates.confirmEmail)({
-                    firstName: firstName,
-                    url: url
-                  })
-                };
-                transport.sendMail(ConfEmailOptions, /*#__PURE__*/function () {
-                  var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(err) {
-                    return _regenerator["default"].wrap(function _callee3$(_context3) {
-                      while (1) {
-                        switch (_context3.prev = _context3.next) {
-                          case 0:
-                            if (!err) {
-                              _context3.next = 6;
-                              break;
-                            }
-
-                            _context3.next = 3;
-                            return user["delete"]();
-
-                          case 3:
-                            _context3.next = 5;
-                            return token["delete"]();
-
-                          case 5:
-                            return _context3.abrupt("return", res.status(500).json({
-                              msg: err.message,
-                              error: "Can't send verification email, try again"
-                            }));
-
-                          case 6:
-                            res.status(200).json({
-                              msg: "Verification email has been sent to ".concat(email),
-                              email: email,
-                              token: token
-                            });
-
-                          case 7:
-                          case "end":
-                            return _context3.stop();
-                        }
-                      }
-                    }, _callee3);
-                  }));
-
-                  return function (_x5) {
-                    return _ref2.apply(this, arguments);
-                  };
-                }());
-                _context4.next = 29;
-                break;
-
-              case 26:
-                _context4.prev = 26;
-                _context4.t0 = _context4["catch"](2);
-                res.status(400).json({
-                  err: _context4.t0,
-                  error: "Error occured"
+                name = firstName;
+                _context2.next = 25;
+                return (0, _emails.sendEmail)((0, _emails.setEmail)(process.env.EMAIL, user.email, "Confirm Email", (0, _templates.confirmEmail)({
+                  name: name,
+                  url: url
+                }))).then(function (result) {
+                  return res.status(200).json({
+                    msg: "Verification email has been sent to ".concat(email),
+                    email: email,
+                    token: token
+                  });
+                })["catch"](function (error) {
+                  return res.status(500).json({
+                    msg: err.message,
+                    error: "Can't send verification email, try again",
+                    err: error
+                  });
                 });
 
-              case 29:
+              case 25:
+                _context2.next = 30;
+                break;
+
+              case 27:
+                _context2.prev = 27;
+                _context2.t0 = _context2["catch"](2);
+                return _context2.abrupt("return", res.status(400).json({
+                  err: _context2.t0,
+                  error: "Something went wrong"
+                }));
+
+              case 30:
               case "end":
-                return _context4.stop();
+                return _context2.stop();
             }
           }
-        }, _callee4, null, [[2, 26]]);
+        }, _callee2, null, [[2, 27]]);
       }));
 
       function Signup(_x3, _x4) {
@@ -343,75 +261,69 @@ var AuthController = /*#__PURE__*/function () {
   }, {
     key: "ConfEmail",
     value: function () {
-      var _ConfEmail = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(req, res) {
-        var _req$params, id, token, user, _token;
+      var _ConfEmail = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(req, res) {
+        var user, token, _token;
 
-        return _regenerator["default"].wrap(function _callee5$(_context5) {
+        return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                _context5.prev = 0;
-                _req$params = req.params, id = _req$params.id, token = _req$params.token;
-                _context5.next = 4;
-                return _User["default"].findOne({
-                  _id: id
-                });
-
-              case 4:
-                user = _context5.sent;
-                _context5.next = 7;
+                _context3.prev = 0;
+                user = req.user;
+                token = req.params.token;
+                _context3.next = 5;
                 return _VerificationToken["default"].findOne({
                   token: token,
-                  _userId: id
+                  _userId: user._id
                 });
 
-              case 7:
-                _token = _context5.sent;
+              case 5:
+                _token = _context3.sent;
 
                 if (_token) {
-                  _context5.next = 10;
+                  _context3.next = 8;
                   break;
                 }
 
-                return _context5.abrupt("return", res.status(400).json({
+                return _context3.abrupt("return", res.status(400).json({
                   error: "Invalid token"
                 }));
 
-              case 10:
+              case 8:
                 user.isVerified = true;
-                _context5.next = 13;
+                _context3.next = 11;
                 return user.save();
 
-              case 13:
-                _context5.next = 15;
+              case 11:
+                _context3.next = 13;
                 return _VerificationToken["default"].deleteMany({
                   where: {
-                    _userId: id
+                    _userId: user._id
                   }
                 });
 
-              case 15:
-                return _context5.abrupt("return", res.status(201).json({
+              case 13:
+                return _context3.abrupt("return", res.status(201).json({
                   msg: "Your account is verified now, please login!"
                 }));
 
-              case 18:
-                _context5.prev = 18;
-                _context5.t0 = _context5["catch"](0);
-                res.status(500).json({
+              case 16:
+                _context3.prev = 16;
+                _context3.t0 = _context3["catch"](0);
+                return _context3.abrupt("return", res.status(500).json({
                   error: "Something went wrong, try again",
-                  err: _context5.t0
-                });
+                  err: _context3.t0
+                }));
 
-              case 21:
+              case 19:
               case "end":
-                return _context5.stop();
+                return _context3.stop();
             }
           }
-        }, _callee5, null, [[0, 18]]);
+        }, _callee3, null, [[0, 16]]);
       }));
 
-      function ConfEmail(_x6, _x7) {
+      function ConfEmail(_x5, _x6) {
         return _ConfEmail.apply(this, arguments);
       }
 
@@ -420,111 +332,64 @@ var AuthController = /*#__PURE__*/function () {
   }, {
     key: "ResendConfEmail",
     value: function () {
-      var _ResendConfEmail = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7(req, res) {
-        var id, user, firstName, email, token, url, ConfEmailOptions;
-        return _regenerator["default"].wrap(function _callee7$(_context7) {
+      var _ResendConfEmail = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(req, res) {
+        var user, firstName, email, token, url, name;
+        return _regenerator["default"].wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context7.prev = 0;
-                id = req.params.id;
-                _context7.next = 4;
-                return _User["default"].findOne({
-                  _id: id
-                });
-
-              case 4:
-                user = _context7.sent;
-
-                if (user) {
-                  _context7.next = 7;
-                  break;
-                }
-
-                return _context7.abrupt("return", res.status(400).json({
-                  error: "Can't find user"
-                }));
-
-              case 7:
+                _context4.prev = 0;
+                user = req.user;
                 firstName = user.firstName, email = user.email;
                 token = new _VerificationToken["default"]({
                   _userId: user._id,
                   token: _crypto["default"].randomBytes(16).toString("hex")
                 });
-                _context7.next = 11;
+                _context4.next = 6;
                 return token.save();
 
-              case 11:
+              case 6:
                 url = "".concat(process.env.FRONTEND_URL, "/account/verify/").concat(user._id, "/").concat(token.token);
-                ConfEmailOptions = {
-                  from: process.env.Email,
-                  to: email,
-                  subject: "Confirm Email",
-                  html: (0, _emailTemplates.confirmEmail)({
-                    firstName: firstName,
-                    url: url
-                  })
-                };
-                transport.sendMail(ConfEmailOptions, /*#__PURE__*/function () {
-                  var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(err) {
-                    return _regenerator["default"].wrap(function _callee6$(_context6) {
-                      while (1) {
-                        switch (_context6.prev = _context6.next) {
-                          case 0:
-                            if (!err) {
-                              _context6.next = 4;
-                              break;
-                            }
+                name = firstName;
+                _context4.next = 10;
+                return (0, _emails.sendEmail)((0, _emails.setEmail)(process.env.EMAIL, user.email, "Confirm Email", (0, _templates.confirmEmail)({
+                  name: name,
+                  url: url
+                }))).then(function (result) {
+                  return res.status(200).json({
+                    msg: "Verification email has been sent to ".concat(email),
+                    email: email,
+                    token: token
+                  });
+                })["catch"](function (error) {
+                  return res.status(500).json({
+                    msg: err.message,
+                    error: "Can't send verification email, try again",
+                    err: error
+                  });
+                });
 
-                            _context6.next = 3;
-                            return user["delete"]();
-
-                          case 3:
-                            return _context6.abrupt("return", res.status(500).json({
-                              msg: err.message,
-                              error: "Can't send verification email , try again"
-                            }));
-
-                          case 4:
-                            return _context6.abrupt("return", res.status(200).json({
-                              msg: "Verification email has been sent to ".concat(email),
-                              email: email,
-                              token: token.token
-                            }));
-
-                          case 5:
-                          case "end":
-                            return _context6.stop();
-                        }
-                      }
-                    }, _callee6);
-                  }));
-
-                  return function (_x10) {
-                    return _ref3.apply(this, arguments);
-                  };
-                }());
-                _context7.next = 20;
+              case 10:
+                _context4.next = 15;
                 break;
 
-              case 16:
-                _context7.prev = 16;
-                _context7.t0 = _context7["catch"](0);
-                console.log(_context7.t0);
-                return _context7.abrupt("return", res.status(500).json({
-                  err: _context7.t0,
+              case 12:
+                _context4.prev = 12;
+                _context4.t0 = _context4["catch"](0);
+                return _context4.abrupt("return", res.status(500).json({
+                  err: _context4.t0,
                   msg: "Something went wrong"
                 }));
 
-              case 20:
+              case 15:
               case "end":
-                return _context7.stop();
+                return _context4.stop();
             }
           }
-        }, _callee7, null, [[0, 16]]);
+        }, _callee4, null, [[0, 12]]);
       }));
 
-      function ResendConfEmail(_x8, _x9) {
+      function ResendConfEmail(_x7, _x8) {
         return _ResendConfEmail.apply(this, arguments);
       }
 
@@ -533,114 +398,63 @@ var AuthController = /*#__PURE__*/function () {
   }, {
     key: "SendPassResetLink",
     value: function () {
-      var _SendPassResetLink = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(req, res) {
-        var email, user, Token, firstName, url, PassResetOptions;
-        return _regenerator["default"].wrap(function _callee9$(_context9) {
+      var _SendPassResetLink = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(req, res) {
+        var user, Token, firstName, email, url;
+        return _regenerator["default"].wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context9.prev = _context9.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                _context9.prev = 0;
-                email = req.body.email;
-                _context9.next = 4;
-                return _User["default"].findOne({
-                  email: email
-                });
-
-              case 4:
-                user = _context9.sent;
-
-                if (user) {
-                  _context9.next = 7;
-                  break;
-                }
-
-                return _context9.abrupt("return", res.status(400).json({
-                  error: "Can't find user"
-                }));
-
-              case 7:
-                if (user.isVerified) {
-                  _context9.next = 9;
-                  break;
-                }
-
-                return _context9.abrupt("return", res.redirect("".concat(process.env.FRONTEND_URL, "/account/confirm/").concat(user._id)));
-
-              case 9:
+                _context5.prev = 0;
+                user = req.user;
                 Token = new _PassResetToken["default"]({
                   _userId: user._id,
                   token: _crypto["default"].randomBytes(16).toString("hex")
                 });
-                _context9.next = 12;
+                _context5.next = 5;
                 return Token.save();
 
-              case 12:
-                firstName = user.firstName;
+              case 5:
+                firstName = user.firstName, email = user.email;
                 url = "".concat(process.env.FRONTEND_URL, "/password/reset/").concat(user._id, "/").concat(Token.token);
-                PassResetOptions = {
-                  from: process.env.Email,
-                  to: email,
-                  subject: "Reset Password",
-                  html: (0, _emailTemplates.resetPassword)({
-                    firstName: firstName,
-                    url: url
-                  })
-                };
-                transport.sendMail(PassResetOptions, /*#__PURE__*/function () {
-                  var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(err) {
-                    return _regenerator["default"].wrap(function _callee8$(_context8) {
-                      while (1) {
-                        switch (_context8.prev = _context8.next) {
-                          case 0:
-                            if (!err) {
-                              _context8.next = 2;
-                              break;
-                            }
+                _context5.next = 9;
+                return (0, _emails.sendEmail)((0, _emails.setEmail)(process.env.EMAIL, user.email, "Reset Password", (0, _templates.resetPassword)({
+                  firstName: firstName,
+                  url: url
+                }))).then(function (result) {
+                  return res.status(200).json({
+                    msg: "Password reset link has been sent to ".concat(email),
+                    email: email,
+                    token: Token.token
+                  });
+                })["catch"](function (error) {
+                  return res.status(500).json({
+                    msg: err.message,
+                    error: "Can't send password reset email, try again",
+                    err: error
+                  });
+                });
 
-                            return _context8.abrupt("return", res.status(500).json({
-                              msg: err.message,
-                              error: "Can't send password reset link , try again"
-                            }));
-
-                          case 2:
-                            return _context8.abrupt("return", res.status(200).json({
-                              msg: "Password reset link has been sent to ".concat(email),
-                              email: email,
-                              token: Token.token
-                            }));
-
-                          case 3:
-                          case "end":
-                            return _context8.stop();
-                        }
-                      }
-                    }, _callee8);
-                  }));
-
-                  return function (_x13) {
-                    return _ref4.apply(this, arguments);
-                  };
-                }());
-                _context9.next = 21;
+              case 9:
+                _context5.next = 14;
                 break;
 
-              case 18:
-                _context9.prev = 18;
-                _context9.t0 = _context9["catch"](0);
-                return _context9.abrupt("return", res.status(400).json({
+              case 11:
+                _context5.prev = 11;
+                _context5.t0 = _context5["catch"](0);
+                return _context5.abrupt("return", res.status(400).json({
                   error: "Something went wrong",
-                  err: _context9.t0
+                  err: _context5.t0
                 }));
 
-              case 21:
+              case 14:
               case "end":
-                return _context9.stop();
+                return _context5.stop();
             }
           }
-        }, _callee9, null, [[0, 18]]);
+        }, _callee5, null, [[0, 11]]);
       }));
 
-      function SendPassResetLink(_x11, _x12) {
+      function SendPassResetLink(_x9, _x10) {
         return _SendPassResetLink.apply(this, arguments);
       }
 
@@ -649,104 +463,123 @@ var AuthController = /*#__PURE__*/function () {
   }, {
     key: "ResetPassword",
     value: function () {
-      var _ResetPassword = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(req, res) {
-        var _req$body2, password, passwordConf, _req$params2, id, token, user, _token, salt, hashedPassword;
+      var _ResetPassword = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(req, res) {
+        var _req$body2, password, passwordConf, token, user, _token, salt, hashedPassword;
 
-        return _regenerator["default"].wrap(function _callee10$(_context10) {
+        return _regenerator["default"].wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context10.prev = _context10.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                _context10.prev = 0;
+                _context6.prev = 0;
                 _req$body2 = req.body, password = _req$body2.password, passwordConf = _req$body2.passwordConf;
 
                 if (!(password !== passwordConf)) {
-                  _context10.next = 4;
+                  _context6.next = 4;
                   break;
                 }
 
-                return _context10.abrupt("return", res.status(400).json({
+                return _context6.abrupt("return", res.status(400).json({
                   error: "Passwords doesn't match"
                 }));
 
               case 4:
-                _req$params2 = req.params, id = _req$params2.id, token = _req$params2.token;
-                _context10.next = 7;
-                return _User["default"].findOne({
-                  _id: id
-                });
-
-              case 7:
-                user = _context10.sent;
-                _context10.next = 10;
+                token = req.params.token;
+                user = req.user;
+                _context6.next = 8;
                 return _PassResetToken["default"].findOne({
-                  _userId: id,
+                  _userId: user._id,
                   token: token
                 });
 
-              case 10:
-                _token = _context10.sent;
+              case 8:
+                _token = _context6.sent;
 
                 if (_token) {
-                  _context10.next = 13;
+                  _context6.next = 11;
                   break;
                 }
 
-                return _context10.abrupt("return", res.status(400).json({
+                return _context6.abrupt("return", res.status(400).json({
                   error: "Invalid token"
                 }));
 
-              case 13:
-                _context10.next = 15;
+              case 11:
+                _context6.next = 13;
                 return _bcryptjs["default"].genSalt(10);
 
-              case 15:
-                salt = _context10.sent;
-                _context10.next = 18;
+              case 13:
+                salt = _context6.sent;
+                _context6.next = 16;
                 return _bcryptjs["default"].hash(password, salt);
 
-              case 18:
-                hashedPassword = _context10.sent;
-                _context10.next = 21;
+              case 16:
+                hashedPassword = _context6.sent;
+                _context6.next = 19;
                 return user.updateOne({
-                  _id: id
-                }, {
                   $set: {
                     password: hashedPassword
                   }
                 });
 
-              case 21:
-                _context10.next = 23;
+              case 19:
+                _context6.next = 21;
                 return _PassResetToken["default"].deleteMany({
-                  _userId: id
+                  _userId: user._id
                 });
 
-              case 23:
-                return _context10.abrupt("return", res.status(201).json({
+              case 21:
+                return _context6.abrupt("return", res.status(201).json({
                   msg: "Password reset successfuly"
                 }));
 
-              case 26:
-                _context10.prev = 26;
-                _context10.t0 = _context10["catch"](0);
-                return _context10.abrupt("return", res.status(400).json({
+              case 24:
+                _context6.prev = 24;
+                _context6.t0 = _context6["catch"](0);
+                return _context6.abrupt("return", res.status(400).json({
                   error: "Something went wrong",
-                  err: _context10.t0
+                  err: _context6.t0
                 }));
 
-              case 29:
+              case 27:
               case "end":
-                return _context10.stop();
+                return _context6.stop();
             }
           }
-        }, _callee10, null, [[0, 26]]);
+        }, _callee6, null, [[0, 24]]);
       }));
 
-      function ResetPassword(_x14, _x15) {
+      function ResetPassword(_x11, _x12) {
         return _ResetPassword.apply(this, arguments);
       }
 
       return ResetPassword;
+    }()
+  }, {
+    key: "CheckLogin",
+    value: function () {
+      var _CheckLogin = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7(req, res) {
+        return _regenerator["default"].wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                return _context7.abrupt("return", res.status(200).json({
+                  msg: "User is logged in",
+                  user: req.user
+                }));
+
+              case 1:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7);
+      }));
+
+      function CheckLogin(_x13, _x14) {
+        return _CheckLogin.apply(this, arguments);
+      }
+
+      return CheckLogin;
     }()
   }]);
   return AuthController;

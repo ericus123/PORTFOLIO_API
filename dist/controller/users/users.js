@@ -36,22 +36,11 @@ var UsersController = /*#__PURE__*/function () {
 
               case 2:
                 users = _context.sent;
-
-                if (users) {
-                  _context.next = 5;
-                  break;
-                }
-
-                return _context.abrupt("return", res.status(400).json({
-                  error: "can't find all users"
-                }));
-
-              case 5:
                 return _context.abrupt("return", res.status(200).json({
                   users: users
                 }));
 
-              case 6:
+              case 4:
               case "end":
                 return _context.stop();
             }
@@ -79,27 +68,16 @@ var UsersController = /*#__PURE__*/function () {
 
               case 2:
                 users = _context2.sent;
-
-                if (users) {
-                  _context2.next = 5;
-                  break;
-                }
-
-                return _context2.abrupt("return", res.status(400).json({
-                  error: "can't find all users"
-                }));
-
-              case 5:
-                _context2.next = 7;
+                _context2.next = 5;
                 return _User["default"].deleteMany({});
 
-              case 7:
+              case 5:
                 return _context2.abrupt("return", res.status(200).json({
-                  msg: "users deleted successfully",
+                  msg: "Users deleted successfully",
                   users: users
                 }));
 
-              case 8:
+              case 6:
               case "end":
                 return _context2.stop();
             }
@@ -135,8 +113,8 @@ var UsersController = /*#__PURE__*/function () {
                   break;
                 }
 
-                return _context3.abrupt("return", res.status(400).json({
-                  error: "can't find user"
+                return _context3.abrupt("return", res.status(404).json({
+                  error: "User not found"
                 }));
 
               case 5:
@@ -145,7 +123,7 @@ var UsersController = /*#__PURE__*/function () {
 
               case 7:
                 return _context3.abrupt("return", res.status(201).json({
-                  msg: "user deleted successfuly",
+                  msg: "User deleted successfuly",
                   user: user
                 }));
 
@@ -186,7 +164,7 @@ var UsersController = /*#__PURE__*/function () {
                 }
 
                 return _context4.abrupt("return", res.status(400).json({
-                  error: "can't find user"
+                  error: "User not found"
                 }));
 
               case 5:

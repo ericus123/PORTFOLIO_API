@@ -18,6 +18,23 @@ var categorySchema = new _mongoose["default"].Schema({
   description: {
     type: String,
     required: true
+  },
+  updatedBy: {
+    type: _mongoose["default"].Schema.Types.ObjectId,
+    ref: "User",
+    "default": null
+  },
+  createdAt: {
+    type: Date,
+    "default": Date.now
+  },
+  updatedAt: {
+    type: Date,
+    "default": null
+  },
+  createdBy: {
+    type: _mongoose["default"].Schema.Types.ObjectId,
+    ref: "User"
   }
 });
 

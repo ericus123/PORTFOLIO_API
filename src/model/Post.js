@@ -36,13 +36,7 @@ const postSchema = new mongoose.Schema({
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "PostLikes",
-    },
-  ],
-  unLikes: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "PostUnLikes",
+      ref: "PostReactions",
     },
   ],
   slug: {

@@ -21,6 +21,8 @@ var _roles = _interopRequireDefault(require("./routes/roles/roles"));
 
 var _auth = _interopRequireDefault(require("./routes/auth/auth"));
 
+var _emails = _interopRequireDefault(require("./routes/emails/emails"));
+
 var _posts = _interopRequireDefault(require("./routes/blog/posts"));
 
 var _newsLetter = _interopRequireDefault(require("./routes/subscriptions/newsLetter"));
@@ -84,15 +86,18 @@ app.use("/api/profile", _profile["default"]);
 app.use("/api/subscriptions/newsletter", _newsLetter["default"]);
 app.use("/api/posts", _posts["default"]);
 app.use("/api/blog", _videos["default"]);
+app.use("/api/emails", _emails["default"]);
 app.use("/api/messages", _messages["default"]);
 app.use("/", function (req, res) {
   res.status(200).json({
     message: "Hello ! Welcome on our website "
   });
-}); // app.use((req, res, next) => {
-//   res.status(404).json({ error: "wrong route" });
-//   next();
-// });
-
+});
+app.use(function (req, res, next) {
+  res.status(404).json({
+    error: "wrong route"
+  });
+  next();
+});
 var _default = app;
 exports["default"] = _default;

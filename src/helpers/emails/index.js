@@ -17,7 +17,7 @@ const setAccessToken = async () => {
   try {
     accessToken = await oAuth2Client.getAccessToken();
   } catch (error) {
-    return res.status(500).json({ error: "Connection error" })
+    return error;
   }
 
 };

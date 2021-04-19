@@ -19,16 +19,9 @@ var _User = _interopRequireDefault(require("../../model/User"));
 
 var _dotenv = _interopRequireDefault(require("dotenv"));
 
-var cloudinary = require("cloudinary").v2;
+var _index = require("../../helpers/images/index");
 
 _dotenv["default"].config();
-
-var uploads = {};
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
 
 var ProfileController = /*#__PURE__*/function () {
   function ProfileController() {
@@ -36,98 +29,101 @@ var ProfileController = /*#__PURE__*/function () {
   }
 
   (0, _createClass2["default"])(ProfileController, null, [{
-    key: "updateUser",
+    key: "updateProfile",
     value: function () {
-      var _updateUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(req, res) {
-        var id, emailExists, user, updatedUser;
+      var _updateProfile = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(req, res) {
+        var id, user, _req$body, username, bio, firstName, lastName, img, uploaded_image, updatedUser;
+
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                id = req.user.id; //Check if a user email is already in the database
-
-                _context.next = 3;
-                return _User["default"].findOne({
-                  email: req.body.email
-                });
-
-              case 3:
-                emailExists = _context.sent;
-
-                if (!emailExists) {
-                  _context.next = 6;
-                  break;
-                }
-
-                return _context.abrupt("return", res.status(400).json({
-                  error: "Email already exists"
-                }));
-
-              case 6:
-                _context.prev = 6;
-                _context.next = 9;
+                id = req.user.id;
+                _context.prev = 1;
+                _context.next = 4;
                 return _User["default"].findOne({
                   email: req.user.email
                 });
 
-              case 9:
+              case 4:
                 user = _context.sent;
 
                 if (user) {
-                  _context.next = 12;
+                  _context.next = 7;
+                  break;
+                }
+
+                return _context.abrupt("return", res.status(404).json({
+                  error: "User not found"
+                }));
+
+              case 7:
+                if (user.isComplete) {
+                  _context.next = 9;
                   break;
                 }
 
                 return _context.abrupt("return", res.status(400).json({
-                  error: "can't update user"
+                  error: "Please complete your profile first"
                 }));
 
+              case 9:
+                _req$body = req.body, username = _req$body.username, bio = _req$body.bio, firstName = _req$body.firstName, lastName = _req$body.lastName, img = _req$body.img;
+                _context.next = 12;
+                return (0, _index.uploadImage)(img, "/Users/Avatars");
+
               case 12:
-                _context.next = 14;
+                uploaded_image = _context.sent;
+                _context.next = 15;
+                return (0, _index.deleteImage)(user.avatar_public_id);
+
+              case 15:
+                _context.next = 17;
                 return user.updateOne({
                   $set: {
-                    username: req.body.username,
-                    bio: req.body.bio,
-                    firstName: req.body.firstName,
-                    lastName: req.body.lastName
+                    username: username,
+                    bio: bio,
+                    firstName: firstName,
+                    lastName: lastName,
+                    avatar: uploaded_image.secure_url,
+                    avatar_public_id: uploaded_image.public_id
                   }
                 });
 
-              case 14:
-                _context.next = 16;
+              case 17:
+                _context.next = 19;
                 return _User["default"].find({
                   email: req.user.email
                 });
 
-              case 16:
+              case 19:
                 updatedUser = _context.sent;
-                res.status(201).json({
-                  msg: "user updated successfuly",
+                return _context.abrupt("return", res.status(201).json({
+                  msg: "Profile updated successfuly",
                   user: updatedUser
-                });
-                _context.next = 23;
-                break;
-
-              case 20:
-                _context.prev = 20;
-                _context.t0 = _context["catch"](6);
-                res.status(400).json({
-                  error: "failed to update profile"
-                });
+                }));
 
               case 23:
+                _context.prev = 23;
+                _context.t0 = _context["catch"](1);
+                return _context.abrupt("return", res.status(400).json({
+                  error: "Failed to update profile",
+                  err: _context.t0
+                }));
+
+              case 26:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, null, [[6, 20]]);
+        }, _callee, null, [[1, 23]]);
       }));
 
-      function updateUser(_x, _x2) {
-        return _updateUser.apply(this, arguments);
+      function updateProfile(_x, _x2) {
+        return _updateProfile.apply(this, arguments);
       }
 
-      return updateUser;
+      return updateProfile;
     }()
   }, {
     key: "viewProfile",
@@ -152,23 +148,21 @@ var ProfileController = /*#__PURE__*/function () {
                   break;
                 }
 
-                return _context2.abrupt("return", res.status(400).json({
-                  error: "cant't find user"
+                return _context2.abrupt("return", res.status(404).json({
+                  error: "Profile not found"
                 }));
 
               case 6:
-                res.status(200).json({
+                return _context2.abrupt("return", res.status(200).json({
                   profile: user
-                });
-                _context2.next = 12;
-                break;
+                }));
 
               case 9:
                 _context2.prev = 9;
                 _context2.t0 = _context2["catch"](0);
-                res.status(400).json({
-                  error: "error retrieving user"
-                });
+                return _context2.abrupt("return", res.status(400).json({
+                  error: "Something went wrong, try again"
+                }));
 
               case 12:
               case "end":
@@ -188,68 +182,49 @@ var ProfileController = /*#__PURE__*/function () {
     key: "completeProfile",
     value: function () {
       var _completeProfile = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(req, res) {
-        var user, fileStr, uploadResponse, updatedUser;
+        var _req$body2, bio, img, uploaded_image, updatedUser;
+
         return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.prev = 0;
-                _context3.next = 3;
-                return _User["default"].findOne({
-                  _id: req.user.id
-                });
+                _req$body2 = req.body, bio = _req$body2.bio, img = _req$body2.img;
+                _context3.next = 4;
+                return (0, _index.uploadImage)(img, "/Users/Avatars");
 
-              case 3:
-                user = _context3.sent;
-
-                if (!user) {
-                  res.status(400).json({
-                    error: "User doesn't exist"
-                  });
-                }
-
-                if (user.imageUrl != null && user.bio != null) {
-                  res.status(400).json({
-                    error: "Your profile is already complete"
-                  });
-                }
-
-                fileStr = req.body.img;
-                _context3.next = 9;
-                return cloudinary.uploader.upload(fileStr);
-
-              case 9:
-                uploadResponse = _context3.sent;
-                _context3.next = 12;
-                return user.updateOne({
+              case 4:
+                uploaded_image = _context3.sent;
+                _context3.next = 7;
+                return req.profile.updateOne({
                   $set: {
-                    bio: req.body.bio,
-                    imageUrl: uploadResponse.url
+                    bio: bio,
+                    avatar: uploaded_image.secure_url,
+                    avatar_public_id: uploaded_image.public_id,
+                    isComplete: true
                   }
                 });
 
-              case 12:
+              case 7:
                 updatedUser = _context3.sent;
-                res.status(201).json({
+                return _context3.abrupt("return", res.status(201).json({
                   msg: "Profile completed successfuly"
-                });
-                _context3.next = 19;
-                break;
+                }));
 
-              case 16:
-                _context3.prev = 16;
+              case 11:
+                _context3.prev = 11;
                 _context3.t0 = _context3["catch"](0);
-                res.status(400).json({
-                  error: "Error occured",
+                return _context3.abrupt("return", res.status(400).json({
+                  error: "Something went wrong",
                   err: _context3.t0
-                });
+                }));
 
-              case 19:
+              case 14:
               case "end":
                 return _context3.stop();
             }
           }
-        }, _callee3, null, [[0, 16]]);
+        }, _callee3, null, [[0, 11]]);
       }));
 
       function completeProfile(_x5, _x6) {
@@ -267,38 +242,51 @@ var ProfileController = /*#__PURE__*/function () {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                _context4.next = 2;
+                _context4.prev = 0;
+                _context4.next = 3;
                 return _User["default"].findOne({
                   email: req.user.email
                 });
 
-              case 2:
+              case 3:
                 user = _context4.sent;
 
                 if (user) {
-                  _context4.next = 5;
+                  _context4.next = 6;
                   break;
                 }
 
-                return _context4.abrupt("return", res.status(400).json({
-                  error: "can't find user"
+                return _context4.abrupt("return", res.status(404).json({
+                  error: "User not found"
                 }));
 
-              case 5:
-                _context4.next = 7;
+              case 6:
+                _context4.next = 8;
                 return user["delete"]();
 
-              case 7:
-                res.status(201).json({
-                  msg: "account deleted successfuly"
-                });
-
               case 8:
+                _context4.next = 10;
+                return (0, _index.deleteImage)(user.avatar_public_id);
+
+              case 10:
+                return _context4.abrupt("return", res.status(201).json({
+                  msg: "Account deleted successfuly"
+                }));
+
+              case 13:
+                _context4.prev = 13;
+                _context4.t0 = _context4["catch"](0);
+                return _context4.abrupt("return", res.status(500).json({
+                  error: "Something went wrong",
+                  err: _context4.t0
+                }));
+
+              case 16:
               case "end":
                 return _context4.stop();
             }
           }
-        }, _callee4);
+        }, _callee4, null, [[0, 13]]);
       }));
 
       function deleteAccount(_x7, _x8) {

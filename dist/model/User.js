@@ -53,7 +53,11 @@ var userSchema = new _mongoose["default"].Schema({
     "default": "basic",
     "enum": ["basic", "admin", "superAdmin"]
   },
-  imageUrl: {
+  avatar: {
+    type: String,
+    "default": null
+  },
+  avatar_public_id: {
     type: String,
     "default": null
   },
@@ -63,7 +67,15 @@ var userSchema = new _mongoose["default"].Schema({
   }],
   passwordResetToken: String,
   passwordResetExpires: Date,
-  date: {
+  isComplete: {
+    type: Boolean,
+    "default": false
+  },
+  createdAt: {
+    type: Date,
+    "default": Date.now
+  },
+  updatedAt: {
     type: Date,
     "default": Date.now
   }

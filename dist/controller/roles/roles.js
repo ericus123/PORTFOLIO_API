@@ -44,8 +44,8 @@ var UserRoles = /*#__PURE__*/function () {
                   break;
                 }
 
-                return _context.abrupt("return", res.status(400).json({
-                  error: "user not found"
+                return _context.abrupt("return", res.status(404).json({
+                  error: "User not found"
                 }));
 
               case 5:
@@ -55,19 +55,13 @@ var UserRoles = /*#__PURE__*/function () {
                 });
 
               case 7:
-                _context.next = 9;
-                return _User["default"].find({
-                  email: req.body.email
-                });
+                assignedUser = _context.sent;
+                return _context.abrupt("return", res.status(201).json({
+                  msg: "Role assigned successfuly",
+                  user: assignedUser
+                }));
 
               case 9:
-                assignedUser = _context.sent;
-                res.status(201).json({
-                  msg: "role assigned successfuly",
-                  user: assignedUser
-                });
-
-              case 11:
               case "end":
                 return _context.stop();
             }

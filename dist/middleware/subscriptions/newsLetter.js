@@ -15,7 +15,7 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
-var _emailCheck = _interopRequireDefault(require("email-check"));
+var _deepEmailValidator = _interopRequireDefault(require("deep-email-validator"));
 
 var NewsLetterMiddleware = /*#__PURE__*/function () {
   function NewsLetterMiddleware() {
@@ -26,45 +26,53 @@ var NewsLetterMiddleware = /*#__PURE__*/function () {
     key: "checkEmail",
     value: function () {
       var _checkEmail = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(req, res, next) {
-        var email;
+        var email, _yield$validate, valid;
+
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                email = req.body.email;
+                email = req.body.email ? req.body.email : req.params.email;
 
-                if (!email) {
-                  res.status(400).json({
-                    error: "Please fill in your email"
-                  });
-                } // Quick version
+                if (!(!email || !email.length)) {
+                  _context.next = 3;
+                  break;
+                }
 
+                return _context.abrupt("return", res.status(400).json({
+                  error: "Email is required"
+                }));
 
-                _context.next = 4;
-                return (0, _emailCheck["default"])(email).then(function (res) {
-                  if (true) {
-                    next();
-                  }
-
-                  res.status(400).json({
-                    error: "Email doesn't exist"
-                  });
-                })["catch"](function (err) {
-                  if (err.message === "refuse") {
-                    // The MX server is refusing requests from your IP address.
-                    res.status(500).json({
-                      error: "Server error, try again!"
-                    });
-                  } else {
-                    // Decide what to do with other errors.
-                    res.status(400).json({
-                      error: "Something went wrong",
-                      err: error
-                    });
-                  }
+              case 3:
+                _context.next = 5;
+                return (0, _deepEmailValidator["default"])({
+                  email: email,
+                  sender: process.env.EMAIL,
+                  validateRegex: true,
+                  validateMx: true,
+                  validateTypo: true,
+                  validateDisposable: true,
+                  validateSMTP: true
                 });
 
-              case 4:
+              case 5:
+                _yield$validate = _context.sent;
+                valid = _yield$validate.valid;
+
+                if (valid) {
+                  _context.next = 9;
+                  break;
+                }
+
+                return _context.abrupt("return", res.status(400).json({
+                  error: "Email is invalid",
+                  email: email
+                }));
+
+              case 9:
+                next();
+
+              case 10:
               case "end":
                 return _context.stop();
             }

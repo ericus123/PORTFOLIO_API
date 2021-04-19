@@ -9,24 +9,21 @@ exports["default"] = void 0;
 
 var _mongoose = _interopRequireDefault(require("mongoose"));
 
-var commentSchema = new _mongoose["default"].Schema({
+var replyReactionsSchema = new _mongoose["default"].Schema({
   user: {
     type: _mongoose["default"].Schema.Types.ObjectId,
     ref: "Users"
   },
-  description: {
-    type: String
-  },
-  replies: [{
+  replyId: {
     type: _mongoose["default"].Schema.Types.ObjectId,
     ref: "CommentReplies"
-  }],
-  likes: [{
-    type: _mongoose["default"].Schema.Types.ObjectId,
-    ref: "CommentReactions"
-  }]
+  },
+  createdAt: {
+    type: Date,
+    "default": Date.now
+  }
 });
 
-var _default = _mongoose["default"].model("Comments", commentSchema);
+var _default = _mongoose["default"].model("ReplyReactions", replyReactionsSchema);
 
 exports["default"] = _default;

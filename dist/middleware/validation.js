@@ -3,12 +3,26 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.messageValidation = exports.categoryValidation = exports.BlogVideosUpdateValidation = exports.BlogVideosValidation = exports.postValidation = exports.postCommentReplyValidation = exports.postCommentValidation = exports.PassResetValidation = exports.PassResetEmailValidation = exports.loginValidation = exports.roleValidation = exports.profileUpdateValidation = exports.completeProfileValidation = exports.userValidation = void 0;
+exports.messageValidation = exports.categoryValidation = exports.BlogVideosUpdateValidation = exports.BlogVideosValidation = exports.postValidation = exports.postCommentReplyValidation = exports.postCommentValidation = exports.PassResetValidation = exports.PassResetEmailValidation = exports.loginValidation = exports.roleValidation = exports.profileUpdateValidation = exports.completeProfileValidation = exports.validateEmail = exports.validateEmails = exports.userValidation = void 0;
 
 var Joi = require("@hapi/joi");
 
 var userValidation = function userValidation(req, res, next) {
   var schema = Joi.object({
+    firstName: Joi.string().min(3).max(12).regex(/[a-zA-Z]/).required().messages({
+      "string.base": "First name must contain letters only ",
+      "string.empty": "Please fill in your first name",
+      "string.min": "Fisrt name must be at least {#limit} characters long",
+      "string.max": "First name must be below {#limit} characters long",
+      "any.required": "First name is required"
+    }),
+    lastName: Joi.string().min(3).max(12).regex(/[a-zA-Z]/).required().messages({
+      "string.base": "Last name must contain letters only ",
+      "string.empty": "Please fill in your last name",
+      "string.min": "Last name must be at least {#limit} characters long",
+      "string.max": "Last name must be below {#limit} characters long",
+      "any.required": "Last name is required"
+    }),
     username: Joi.string().min(3).max(12).regex(/[a-zA-Z]/).required().messages({
       "string.base": "Username must contain letters only ",
       "string.empty": "Please fill in your username",
@@ -35,20 +49,6 @@ var userValidation = function userValidation(req, res, next) {
       "string.min": "Password confirmation must be at least {#limit} characters long",
       "any.required": "Password confirmation is required"
     }),
-    firstName: Joi.string().min(3).max(12).regex(/[a-zA-Z]/).required().messages({
-      "string.base": "First name must contain letters only ",
-      "string.empty": "Please fill in your first name",
-      "string.min": "Fisrt name must be at least {#limit} characters long",
-      "string.max": "First name must be below {#limit} characters long",
-      "any.required": "First name is required"
-    }),
-    lastName: Joi.string().min(3).max(12).regex(/[a-zA-Z]/).required().messages({
-      "string.base": "Last name must contain letters only ",
-      "string.empty": "Please fill in your last name",
-      "string.min": "Last name must be at least {#limit} characters long",
-      "string.max": "Last name must be below {#limit} characters long",
-      "any.required": "Last name is required"
-    }),
     subscribedNewsLetter: Joi["boolean"]()
   });
 
@@ -63,18 +63,27 @@ var userValidation = function userValidation(req, res, next) {
 
 exports.userValidation = userValidation;
 
-var completeProfileValidation = function completeProfileValidation(req, res, next) {
+var validateEmails = function validateEmails(req, res, next) {
   var schema = Joi.object({
-    img: Joi.any().required().messages({
-      "any.empty": "Profile image is required",
-      "any.required": "Profile image is required"
+    message: Joi.string().min(10).required().messages({
+      "string.base": "Mesage must be a valid text ",
+      "string.empty": "Please add a message",
+      "string.min": "Message must be at least {#limit} characters long",
+      "any.required": "Message is required"
     }),
-    bio: Joi.string().min(10).max(40).regex(/[a-zA-Z]/).required().messages({
-      "string.base": "Bio must contain letters only ",
-      "string.empty": "Please fill in your bio",
-      "string.min": "Bio must be at least {#limit} characters long",
-      "string.max": "Bio must be below {#limit} characters long",
-      "any.required": "Bio is required"
+    emails: Joi.array().required().items(Joi.string().min(8).email().required().messages({
+      "string.base": "Email must be a string",
+      "string.email": "Invalid email",
+      "string.empty": "Please fill in your email",
+      "string.min": "Email must be at least {#limit} characters long",
+      "any.required": "Email is required"
+    })),
+    subject: Joi.string().min(10).max(100).required().messages({
+      "string.base": "Subject must be a valid text ",
+      "string.empty": "Please add a subject",
+      "string.min": "Subject must be at least {#limit} characters long",
+      "string.max": "Subject must be below {#limit} characters long",
+      "any.required": "Subject is required"
     })
   });
 
@@ -87,42 +96,107 @@ var completeProfileValidation = function completeProfileValidation(req, res, nex
   next();
 };
 
-exports.completeProfileValidation = completeProfileValidation;
+exports.validateEmails = validateEmails;
 
-var profileUpdateValidation = function profileUpdateValidation(req, res, next) {
+var validateEmail = function validateEmail(req, res, next) {
   var schema = Joi.object({
-    username: Joi.string().min(3).max(12).regex(/[a-zA-Z]/).messages({
-      "string.base": "Username must contain letters only ",
-      "string.empty": "Please fill in your username",
-      "string.min": "Username must be at least {#limit} characters long",
-      "string.max": "Username must be below {#limit} characters long"
+    message: Joi.string().min(10).required().messages({
+      "string.base": "Mesage must be a valid text ",
+      "string.empty": "Please add a message",
+      "string.min": "Message must be at least {#limit} characters long",
+      "any.required": "Message is required"
     }),
-    bio: Joi.string().min(10).max(40).regex(/[a-zA-Z]/).messages({
-      "string.base": "Bio must contain letters only ",
-      "string.empty": "Please fill in your bio",
-      "string.min": "Bio must be at least {#limit} characters long",
-      "string.max": "Bio must be below {#limit} characters long"
+    email: Joi.string().min(8).email().required().messages({
+      "string.base": "Email must be a string",
+      "string.email": "Invalid email",
+      "string.empty": "Please fill in your email",
+      "string.min": "Email must be at least {#limit} characters long",
+      "any.required": "Email is required"
     }),
-    firstName: Joi.string().min(3).max(12).regex(/[a-zA-Z]/).messages({
-      "string.base": "First name must contain letters only ",
-      "string.empty": "Please fill in your first name",
-      "string.min": "Fisrt name must be at least {#limit} characters long",
-      "string.max": "First name must be below {#limit} characters long"
-    }),
-    lastName: Joi.string().min(3).max(12).regex(/[a-zA-Z]/).messages({
-      "string.base": "Last name must contain letters only ",
-      "string.empty": "Please fill in your last name",
-      "string.min": "Last name must be at least {#limit} characters long",
-      "string.max": "Last name must be below {#limit} characters long"
-    }),
-    imageUrl: Joi.string().uri().messages({
-      "string.base": "Url must be a link",
-      "string.empty": "Image url is required"
+    subject: Joi.string().min(10).max(100).required().messages({
+      "string.base": "Subject must be a valid text ",
+      "string.empty": "Please add a subject",
+      "string.min": "Subject must be at least {#limit} characters long",
+      "string.max": "Subject must be below {#limit} characters long",
+      "any.required": "Subject is required"
     })
   });
 
   var _schema$validate3 = schema.validate(req.body),
       error = _schema$validate3.error;
+
+  if (error) return res.status(400).json({
+    error: error.details[0].message
+  });
+  next();
+};
+
+exports.validateEmail = validateEmail;
+
+var completeProfileValidation = function completeProfileValidation(req, res, next) {
+  var schema = Joi.object({
+    img: Joi.string().required().messages({
+      "string.empty": "Profile image is required",
+      "any.required": "Profile image is required"
+    }),
+    bio: Joi.string().min(10).max(40).regex(/[a-zA-Z]/).required().messages({
+      "string.base": "Bio must contain letters only ",
+      "string.empty": "Please fill in your bio",
+      "string.min": "Bio must be at least {#limit} characters long",
+      "string.max": "Bio must be below {#limit} characters long",
+      "any.required": "Bio is required"
+    })
+  });
+
+  var _schema$validate4 = schema.validate(req.body),
+      error = _schema$validate4.error;
+
+  if (error) return res.status(400).json({
+    error: error.details[0].message
+  });
+  next();
+};
+
+exports.completeProfileValidation = completeProfileValidation;
+
+var profileUpdateValidation = function profileUpdateValidation(req, res, next) {
+  var schema = Joi.object({
+    username: Joi.string().min(3).max(12).regex(/[a-zA-Z]/).required().messages({
+      "string.base": "Username must contain letters only ",
+      "string.empty": "Please fill in your username",
+      "string.min": "Username must be at least {#limit} characters long",
+      "string.max": "Username must be below {#limit} characters long",
+      "any.required": "Username is required"
+    }),
+    bio: Joi.string().min(10).max(40).regex(/[a-zA-Z]/).required().messages({
+      "string.base": "Bio must contain letters only ",
+      "string.empty": "Please fill in your bio",
+      "string.min": "Bio must be at least {#limit} characters long",
+      "string.max": "Bio must be below {#limit} characters long",
+      "any.required": "Bio is required"
+    }),
+    firstName: Joi.string().min(3).max(12).regex(/[a-zA-Z]/).required().messages({
+      "string.base": "First name must contain letters only ",
+      "string.empty": "Please fill in your first name",
+      "string.min": "Fisrt name must be at least {#limit} characters long",
+      "string.max": "First name must be below {#limit} characters long",
+      "any.required": "Firstname is required"
+    }),
+    lastName: Joi.string().min(3).max(12).regex(/[a-zA-Z]/).required().messages({
+      "string.base": "Last name must contain letters only ",
+      "string.empty": "Please fill in your last name",
+      "string.min": "Last name must be at least {#limit} characters long",
+      "string.max": "Last name must be below {#limit} characters long",
+      "any.required": "Lastname is required"
+    }),
+    img: Joi.string().required().messages({
+      "string.empty": "Profile image is required",
+      "any.required": "Profile image is required"
+    })
+  });
+
+  var _schema$validate5 = schema.validate(req.body),
+      error = _schema$validate5.error;
 
   if (error) return res.status(400).json({
     error: error.details[0].message
@@ -148,8 +222,8 @@ var roleValidation = function roleValidation(req, res, next) {
     })
   });
 
-  var _schema$validate4 = schema.validate(req.body),
-      error = _schema$validate4.error;
+  var _schema$validate6 = schema.validate(req.body),
+      error = _schema$validate6.error;
 
   if (error) return res.status(400).send({
     error: error.details[0].message
@@ -176,8 +250,8 @@ var loginValidation = function loginValidation(req, res, next) {
     })
   });
 
-  var _schema$validate5 = schema.validate(req.body),
-      error = _schema$validate5.error;
+  var _schema$validate7 = schema.validate(req.body),
+      error = _schema$validate7.error;
 
   if (error) return res.status(400).json({
     error: error.details[0].message
@@ -198,8 +272,8 @@ var PassResetEmailValidation = function PassResetEmailValidation(req, res, next)
     })
   });
 
-  var _schema$validate6 = schema.validate(req.body),
-      error = _schema$validate6.error;
+  var _schema$validate8 = schema.validate(req.body),
+      error = _schema$validate8.error;
 
   if (error) return res.status(400).json({
     error: error.details[0].message
@@ -225,8 +299,8 @@ var PassResetValidation = function PassResetValidation(req, res, next) {
     })
   });
 
-  var _schema$validate7 = schema.validate(req.body),
-      error = _schema$validate7.error;
+  var _schema$validate9 = schema.validate(req.body),
+      error = _schema$validate9.error;
 
   if (error) return res.status(400).json({
     error: error.details[0].message
@@ -245,8 +319,8 @@ var postCommentValidation = function postCommentValidation(req, res, next) {
     })
   });
 
-  var _schema$validate8 = schema.validate(req.body),
-      error = _schema$validate8.error;
+  var _schema$validate10 = schema.validate(req.body),
+      error = _schema$validate10.error;
 
   if (error) return res.status(400).json({
     error: error.details[0].message
@@ -265,8 +339,8 @@ var postCommentReplyValidation = function postCommentReplyValidation(req, res, n
     })
   });
 
-  var _schema$validate9 = schema.validate(req.body),
-      error = _schema$validate9.error;
+  var _schema$validate11 = schema.validate(req.body),
+      error = _schema$validate11.error;
 
   if (error) return res.status(400).json({
     error: error.details[0].message
@@ -292,22 +366,19 @@ var postValidation = function postValidation(req, res, next) {
       "any.required": "Post body is required",
       "string.max": "Post body must be less than  {#limit} characters long"
     }),
-    category: Joi.string().min(4).max(20).regex(/[a-zA-Z]/).required().messages({
-      "string.base": "Post category must contain letters only ",
-      "string.empty": "Please fill in the post category",
-      "string.min": "Category must be at least {#limit} characters long",
-      "string.max": "Category must be below {#limit} characters long",
+    category: Joi.string().required().messages({
+      "number.base": "Category must be  a string",
+      "string.empty": "Please fill in the category",
       "any.required": "Category is required"
     }),
-    imageUrl: Joi.string().uri().messages({
-      "string.base": "Url must be a link",
-      "string.empty": "Image url is required"
-    }),
-    img: Joi.any()
+    img: Joi.string().required().messages({
+      "string.empty": "Profile image is required",
+      "any.required": "Profile image is required"
+    })
   });
 
-  var _schema$validate10 = schema.validate(req.body),
-      error = _schema$validate10.error;
+  var _schema$validate12 = schema.validate(req.body),
+      error = _schema$validate12.error;
 
   if (error) return res.status(400).json({
     error: error.details[0].message
@@ -341,8 +412,8 @@ var BlogVideosValidation = function BlogVideosValidation(req, res, next) {
     })
   });
 
-  var _schema$validate11 = schema.validate(req.body),
-      error = _schema$validate11.error;
+  var _schema$validate13 = schema.validate(req.body),
+      error = _schema$validate13.error;
 
   if (error) return res.status(400).json({
     error: error.details[0].message
@@ -369,8 +440,8 @@ var BlogVideosUpdateValidation = function BlogVideosUpdateValidation(req, res, n
     })
   });
 
-  var _schema$validate12 = schema.validate(req.body),
-      error = _schema$validate12.error;
+  var _schema$validate14 = schema.validate(req.body),
+      error = _schema$validate14.error;
 
   if (error) return res.status(400).json({
     error: error.details[0].message
@@ -398,8 +469,8 @@ var categoryValidation = function categoryValidation(req, res, next) {
     })
   });
 
-  var _schema$validate13 = schema.validate(req.body),
-      error = _schema$validate13.error;
+  var _schema$validate15 = schema.validate(req.body),
+      error = _schema$validate15.error;
 
   if (error) return res.status(400).json({
     error: error.details[0].message
@@ -433,8 +504,8 @@ var messageValidation = function messageValidation(req, res, next) {
     })
   });
 
-  var _schema$validate14 = schema.validate(req.body),
-      error = _schema$validate14.error;
+  var _schema$validate16 = schema.validate(req.body),
+      error = _schema$validate16.error;
 
   if (error) return res.status(400).json({
     error: error.details[0].message
