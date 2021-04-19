@@ -1,23 +1,26 @@
 import mongoose from "mongoose";
 const commentRepliesSchema = new mongoose.Schema({
-  user: {},
-  description: {},
-  date: {
-    type: Date,
-    default: Date.now,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  description: {
+    type: String,
   },
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "CommentReplyLikes",
+      ref: "ReplyReactions",
     },
   ],
-  unLikes: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "CommentReplyUnLikes",
-    },
-  ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: null,
+  },
 });
 
 export default mongoose.model("CommentReplies", commentRepliesSchema);

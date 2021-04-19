@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const postReactionsSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Users",
+    ref: "User",
   },
   postId: {
     type: mongoose.Schema.Types.ObjectId,

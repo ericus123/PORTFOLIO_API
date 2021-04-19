@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const replyReactionsSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Users",
+    ref: "User",
   },
   replyId: {
     type: mongoose.Schema.Types.ObjectId,

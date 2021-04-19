@@ -2,7 +2,11 @@ import mongoose from "mongoose";
 const commentSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Users",
+    ref: "User",
+  },
+  postId:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Posts",
   },
   description: {
     type: String,
@@ -19,6 +23,14 @@ const commentSchema = new mongoose.Schema({
       ref: "CommentReactions",
     },
   ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: null,
+  },
 });
 
 export default mongoose.model("Comments", commentSchema);

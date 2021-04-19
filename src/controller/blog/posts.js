@@ -140,6 +140,7 @@ class PostController {
           updatedBy: req.user.id,
           image_public_id: uploaded_image.public_id,
           updatedAt: Date.now(),
+          updatedBy: req.user.id
         },
       });
       const updatedPost = await Post.findOne({ _id: id });
@@ -251,13 +252,21 @@ class PostController {
   }
 
   static async postComment(req, res) {
-    const { description } = req.body;
+    
+
+    try {
+      const { description } = req.body;
     const comment = new Comment({
       description: description,
       user: req.user.id,
     });
-
-    try {
+      const { description } = req.body;
+      const comment = new Comment({
+        description: description,
+        user: req.user.id,
+        postId: req.params.postId
+      });
+  
       const savedComment = await comment.save();
       const id = savedComment._id;
 
@@ -266,57 +275,99 @@ class PostController {
         { $push: { comments: savedComment._id } },
         { new: true, useFindAndModify: false }
       );
-
-      const post = await Post.findById(req.params.postId).populate("comments");
       return res.status(201).json({ msg: "Comment saved!", comment: savedComment });
     } catch (error) {
-      return res.status(400).json({ error: "Failed to create comment", err: error });
+      return res.status(400).json({ error: "Something went wrong", err: error });
     }
   }
   static async deleteComment(req, res) {
     try {
+      if (req.comment.user._id != req.user.id) {
+        return res.status(401).json({ error: "Unauthorized request" });
+      }
       await Comment.findOneAndDelete(
         { _id: req.params.commentId },
         { useFindAndModify: false }
       );
-      return res.status(201).json({ msg: "Deleted comment" });
+      return res.status(201).json({ msg: "Deleted" });
     } catch (error) {
       return res.status(400).json({ error: "Error occured" });
     }
   }
   static async editComment(req, res) {
     try {
+      if (req.comment.user._id != req.user.id) {
+       return res.status(401).json({ error: "Unauthorized request" });
+      }
       await Comment.findByIdAndUpdate(
         req.params.commentId,
         {
           $set: {
             description: req.body.description,
+            updatedAt: Date.now()
           },
         },
         { useFindAndModify: false }
       );
-      return res.status(201).json({ msg: "Edited comment " });
+      return res.status(201).json({ msg: "Updated" });
     } catch (error) {
-      return res.status(400).json({ error: "Error occured" });
+      return res.status(400).json({ error: "Something went wrong" });
+    }
+  }
+  static async getComment(req, res) {
+    try {
+      const {commentId} = req.params;
+     const comment = await Comment.findById(
+       commentId
+      ).populate([{ 
+        path: "replies",
+        populate: {
+          path: "likes",
+          path: "user"
+        },
+      },
+    "likes",
+    "user"]);
+      if(!comment){
+        return res.status(404).json({error:"Comment not found"});
+      }
+      return res.status(201).json({ msg: "Comment fetched successfully" , comment: comment });
+    } catch (error) {
+      return res.status(400).json({ error: "Something went wrong" });
+    }
+  }
+    static async getComments(req, res) {
+    try {
+      const {postId} = req.params;
+     const comments = await Comment.find({postId:postId}).populate([{ 
+      path: "replies",
+      populate: {
+        path: "likes",
+        path: "user"
+      },
+    },
+    "likes",
+    "user"]);
+      return res.status(201).json({ msg: "Comments fetched successfully" , comment: comments });
+    } catch (error) {
+      return res.status(400).json({ error: "Something went wrong" });
     }
   }
   static async editCommentReply(req, res) {
-    const commentReply = await CommentReply.findById(req.params.commentReplyId);
-    const post = await Post.findById(req.params.postId);
-    if (!post) return res.status(400).json({ error: "Post doesn't exist" });
-    if (!commentReply)
-      return res.status(404).json({ error: "Reply not found" });
-    if (commentReply.user._id != req.user.id)
-      return res.status(401).json({ error: "Unauthorized request" });
+   
     try {
-      await CommentReply.findByIdAndUpdate(req.params.commentReplyId, {
-        $set: {
+      if (req.reply.user._id != req.user.id)
+      return res.status(401).json({ error: "Unauthorized request" });
+      await CommentReply.findByIdAndUpdate(req.params.replyId, 
+       { $set: {
           description: req.body.description,
-        },
-      });
-      return res.status(201).json({ msg: "Edited reply" });
+          updatedAt:Date.now()
+        }},
+        { useFindAndModify: false }
+      );
+      return res.status(201).json({ msg: "Updated" });
     } catch (error) {
-      return res.status(400).json({ error: "Error occured" });
+      return res.status(400).json({ error: "Something went wrong" });
     }
   }
 
@@ -343,7 +394,7 @@ class PostController {
       });
     } catch (error) {
       return res.status(400).json({
-        error: "Failed to reply",
+        error: "Something went wrong",
         err: error,
         commentId: req.params.commentId,
       });
@@ -351,31 +402,18 @@ class PostController {
   }
   static async deleteCommentReply(req, res) {
     try {
+      if (req.reply.user._id != req.user.id)
+      return res.status(401).json({ error: "Unauthorized request" });
       await CommentReply.findOneAndDelete(
-        { _id: req.params.commentReplyId },
+        { _id: req.params.replyId },
         { useFindAndModify: false }
       );
-      return res.status(201).json({ msg: "Deleted reply" });
+      return res.status(201).json({ msg: "Deleted" });
     } catch (error) {
-      return res.status(400).json({ error: "Error occured" });
+      return res.status(400).json({ error: "Something went wrong" });
     }
   }
-  static async editCommentReply(req, res) {
-    try {
-      await CommentReply.findByIdAndUpdate(
-        req.params.commentReplyId,
-        {
-          $set: {
-            description: req.body.description,
-          },
-        },
-        { useFindAndModify: false }
-      );
-      return res.status(201).json({ msg: "Edited reply" });
-    } catch (error) {
-      return res.status(400).json({ error: "Error occured" });
-    }
-  }
+  
   static async reactToThePostComment(req, res) {
 
     try {
@@ -423,83 +461,6 @@ class PostController {
     } catch (error) {
       return res.status(400).json({ error: "Something went wrong", err: error });
     }
-    // const commentReply = await CommentReply.findById(req.params.replyId);
-    // if (!commentReply)
-    //   return res.status(404).json({ error: "Reply not found" });
-    // const user = await User.findById(req.user.id);
-    // const like = new CommentReplyLike({
-    //   user: user,
-    //   userId: req.user.id,
-    // });
-    // const unlike = new CommentReplyUnLike({
-    //   user: user,
-    //   userId: req.user.id,
-    // });
-
-    // try {
-    //   const action = req.params.action;
-    //   const saveLike = async () => {
-    //     const savedLike = await like.save();
-    //     const id = savedLike._id;
-    //     const savedComment = await CommentReply.findByIdAndUpdate(
-    //       req.params.replyId,
-    //       { $push: { likes: savedLike._id } },
-    //       { new: true, useFindAndModify: false }
-    //     );
-
-    //     return res.status(201).json({
-    //       msg: "liked!",
-    //       like: savedLike,
-    //     });
-    //   };
-    //   const saveUnlike = async () => {
-    //     const savedUnLike = await unlike.save();
-    //     const id = savedUnLike._id;
-
-    //     await CommentReply.findByIdAndUpdate(
-    //       req.params.replyId,
-    //       { $push: { unLikes: savedUnLike._id } },
-    //       { new: true, useFindAndModify: false }
-    //     );
-
-    //     return res.status(201).json({
-    //       msg: "unliked!",
-    //       unlike: savedUnLike,
-    //     });
-    //   };
-    //   const hasLiked = await CommentReplyLike.findOne({ userId: req.user.id });
-    //   const hasUnLiked = await CommentReplyUnLike.findOne({
-    //     userId: req.user.id,
-    //   });
-
-    //   if (action == "like") {
-    //     if (hasLiked) {
-    //       await CommentReplyLike.deleteOne({ userId: req.user.id });
-    //       return res.status(201).json({ msg: "Removed like" });
-    //     } else if (hasUnLiked) {
-    //       await CommentReplyUnLike.deleteOne({ userId: req.user.id });
-    //       saveLike();
-    //     } else {
-    //       saveLike();
-    //     }
-    //   } else if (action == "unlike") {
-    //     if (hasLiked) {
-    //       await CommentReplyUnLike.deleteOne({ userId: req.user.id });
-    //       saveUnlike();
-    //     } else if (hasUnLiked) {
-    //       await CommentReplyUnLike.deleteOne({ userId: req.user.id });
-    //       return res.status(201).json({ msg: "Removed unlike" });
-    //     } else {
-    //       saveUnlike();
-    //     }
-    //   } else {
-    //     return res.status(400).json({
-    //       error: `reaction can't be ${action}`,
-    //     });
-    //   }
-    // } catch (error) {
-    //   return res.status(400).json({ error: `Failed to ${action} `, err: error });
-    // }
   }
   static async reactToThePost(req, res) {
 

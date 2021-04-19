@@ -14,7 +14,7 @@ const postSchema = new mongoose.Schema({
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Users",
+    ref: "User",
   },
   category: {
     type: mongoose.Schema.Types.ObjectId,
@@ -45,7 +45,7 @@ const postSchema = new mongoose.Schema({
   },
   updatedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Users",
+    ref: "User",
   },
   createdAt: {
     type: Date,

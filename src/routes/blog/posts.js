@@ -85,25 +85,35 @@ postRoute.post(
 //comments
 
 postRoute.post(
-  "/:postId/comment",
+  "/comments/:postId",
   AuthMiddleware.checkToken,
+  PostsMiddleware.postExist,
   postCommentValidation,
   PostController.postComment
 );
+postRoute.get(
+  "/comments/:postId",
+  PostsMiddleware.postExist,
+  PostController.getComments
+);
+postRoute.get(
+  "/comments/single/:commentId",
+  PostController.getComment
+);
 postRoute.delete(
-  "/:postId/:commentId",
+  "/comments/:commentId",
   AuthMiddleware.checkToken,
-  PostsMiddleware.checkPostComment,
+  PostsMiddleware.commentExist,
   PostController.deleteComment
 );
 postRoute.patch(
-  "/:postId/:commentId",
+  "/comments/:commentId",
   AuthMiddleware.checkToken,
-  PostsMiddleware.checkPostComment,
+  PostsMiddleware.commentExist,
   postCommentValidation,
   PostController.editComment
 );
-postRoute.patch(
+postRoute.post(
   "/comments/:commentId/react",
   AuthMiddleware.checkToken,
   PostsMiddleware.commentExist,
@@ -119,19 +129,24 @@ postRoute.post(
   PostController.postCommentReply
 );
 postRoute.delete(
-  "/:postId/:commentId/:commentReplyId",
+  "/replies/:replyId",
   AuthMiddleware.checkToken,
-  PostsMiddleware.checkPostComment,
-  PostsMiddleware.checkPostCommentReply,
+  PostsMiddleware.replyExist,
   PostController.deleteCommentReply
 );
 postRoute.patch(
-  "/:postId/:commentId/:commentReplyId",
+  "/replies/:replyId",
   AuthMiddleware.checkToken,
-  PostsMiddleware.checkPostComment,
-  PostsMiddleware.checkPostCommentReply,
+  PostsMiddleware.replyExist,
   postCommentReplyValidation,
   PostController.editCommentReply
 );
+postRoute.post(
+  "/replies/:replyId/react",
+  AuthMiddleware.checkToken,
+  PostsMiddleware.replyExist,
+  PostController.reactToThePostCommentReply
+);
+
 
 export default postRoute;
