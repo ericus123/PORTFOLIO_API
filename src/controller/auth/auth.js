@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import crypto from "crypto";
 import { sendEmail, setEmail } from "../../helpers/emails";
 import { confirmEmail, resetPassword } from "../../helpers/emails/templates";
+
 dotenv.config();
 
 class AuthController {
@@ -37,7 +38,7 @@ class AuthController {
         email: login.email,
         firstName: login.firstName,
         lastName: login.lastName,
-        imageUrl: login.imageUrl,
+        avatar: login.avatar,
       },
       process.env.TOKEN_SECRET,
       { expiresIn: "1d" }

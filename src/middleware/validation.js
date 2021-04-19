@@ -142,8 +142,8 @@ export const validateEmail = (req, res, next) => {
 
 export const completeProfileValidation = (req, res, next) => {
   const schema = Joi.object({
-    img: Joi.any().required().messages({
-      "any.empty": "Profile image is required",
+    img: Joi.string().required().messages({
+      "string.empty": "Profile image is required",
       "any.required": "Profile image is required",
     }),
     bio: Joi.string()
@@ -213,11 +213,9 @@ export const profileUpdateValidation = (req, res, next) => {
         "string.max": "Last name must be below {#limit} characters long",
         "any.required": "Lastname is required",
       }),
-
-    imageUrl: Joi.string().uri().required().messages({
-      "string.base": "Url must be a link",
-      "string.empty": "Image url is required",
-      "any.required": "Image is required",
+    img: Joi.string().required().messages({
+      "string.empty": "Profile image is required",
+      "any.required": "Profile image is required",
     }),
   });
   const { error } = schema.validate(req.body);
@@ -352,11 +350,10 @@ export const postValidation = (req, res, next) => {
       "string.empty": "Please fill in the category",
       "any.required": "Category is required",
     }),
-    imageUrl: Joi.string().uri().messages({
-      "string.base": "Url must be a link",
-      "string.empty": "Image url is required",
+    img: Joi.string().required().messages({
+      "string.empty": "Profile image is required",
+      "any.required": "Profile image is required",
     }),
-    img: Joi.any(),
   });
   const { error } = schema.validate(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
