@@ -71,6 +71,7 @@ class ProfileController {
         .json({ error: "Something went wrong", err: error });
     }
   }
+
   static async deleteAccount(req, res) {
     try {
       const user = await User.findOne({ email: req.user.email });
