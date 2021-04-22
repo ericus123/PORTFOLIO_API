@@ -256,11 +256,6 @@ class PostController {
 
     try {
       const { description } = req.body;
-    const comment = new Comment({
-      description: description,
-      user: req.user.id,
-    });
-      const { description } = req.body;
       const comment = new Comment({
         description: description,
         user: req.user.id,
