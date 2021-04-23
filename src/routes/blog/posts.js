@@ -28,7 +28,6 @@ postRoute.post(
 
 postRoute.get(
   "/reactions/:postId",
-  AuthMiddleware.checkToken,
   PostsMiddleware.postExist,
   PostController.getPostReactions
 );
