@@ -20,7 +20,7 @@ postRoute.post(
 );
 
 postRoute.post(
-  "/:postId/react",
+  "/reactions/:postId",
   AuthMiddleware.checkToken,
   PostsMiddleware.postExist,
   PostController.reactToThePost
@@ -28,7 +28,6 @@ postRoute.post(
 
 postRoute.get(
   "/reactions/:postId",
-  AuthMiddleware.checkToken,
   PostsMiddleware.postExist,
   PostController.getPostReactions
 );

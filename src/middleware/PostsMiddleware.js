@@ -41,11 +41,12 @@ class PostsMiddleware {
   static async postExist(req, res, next) {
     try {
       const post = await Post.findById(req.params.postId);
+    
       if (!post) return res.status(404).json({ error: "Post not found" });
       req.post = post;
       next();
     } catch (error) {
-      return res.status(400).json({ error: "Something went wrong" })
+      return res.status(400).json({ error: "Something went wrong", err:error })
     }
   }
   static async commentExist(req, res, next) {
@@ -55,7 +56,7 @@ class PostsMiddleware {
       req.comment = comment;
       next();
     } catch (error) {
-      return res.status(400).json({ error: "Something went wrong" })
+      return res.status(400).json({ error: "Something went wrong", err:error })
     }
 
   }
@@ -66,7 +67,7 @@ class PostsMiddleware {
       req.reply = reply;
       next();
     } catch (error) {
-      return res.status(400).json({ error: "Something went wrong" })
+      return res.status(400).json({ error: "Something went wrong", err:error })
     }
   }
   static async checkCategory(req, res, next) {

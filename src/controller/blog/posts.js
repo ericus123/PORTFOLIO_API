@@ -460,18 +460,19 @@ class PostController {
   static async reactToThePost(req, res) {
 
     try {
-      const hasLiked = await PostReaction.findOne({ user: req.user.id });
+      const {postId} = req.params;
+      const hasLiked = await PostReaction.findOne({ user: req.user.id , postId:postId});
       if (hasLiked) {
         await hasLiked.delete();
         return res.status(201).json({ msg: "Unliked" });
       }
       const like = new PostReaction({
         user: req.user.id,
-        postId: req.params.postId
+        postId: postId
       });
       const savedLike = await like.save();
       await Post.findByIdAndUpdate(
-        req.params.postId,
+        postId,
         { $push: { likes: savedLike._id } },
         { new: true, useFindAndModify: false }
       );
