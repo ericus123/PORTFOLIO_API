@@ -41,7 +41,7 @@ class AuthController {
         avatar: login.avatar,
       },
       process.env.TOKEN_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "2h" }
     );
     return res.status(200).json({
       msg: "logged in successfuly",
@@ -223,7 +223,20 @@ class AuthController {
     }
   }
   static async CheckLogin(req, res) {
-    return res.status(200).json({ msg: "User is logged in", user: req.user });
+    const user = await User.findOne({_id:req.user.id});
+    if(!user){
+      return res.status(404).json("User not found");
+    }
+    const userData = {
+      role: user.role,
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatar: user.avatar,
+    }
+    return res.status(200).json({ msg: "User is logged in", user: userData });
   }
 }
 
