@@ -238,6 +238,29 @@ class AuthController {
     }
     return res.status(200).json({ msg: "User is logged in", user: userData });
   }
+  static async changePassword(req,res){
+    try{
+      const {id} = req.user;
+      const {password, passwordConf} = req.body;
+      if(password !== passwordConf){
+        return res.status(400).json({error:"Passwords do not match"})
+      }
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      await User.findByIdAndUpdate(
+        id,
+        {
+          $set:{
+            password:hashedPassword
+          }
+        },
+        {useFindAndModify:false}
+      );
+      return res.status(201).json({msg:"Password changed successfully"});
+    }catch(error){
+    return res.status(500).json({error:"Something went wrong", err:error})
+    }
+  }
 }
 
 export default AuthController;

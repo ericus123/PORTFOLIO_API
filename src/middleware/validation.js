@@ -424,7 +424,7 @@ export const categoryValidation = (req, res, next) => {
       .regex(/[a-zA-Z0-9]/)
       .required()
       .messages({
-        "string.base": "Name must contain letters and numbers only",
+        "string.base": "Name must be a string of characters",
         "string.empty": "Please fill in the name",
         "string.min": "Name must be at least {#limit} characters long",
         "string.max": "Name must be below {#limit} characters long",
