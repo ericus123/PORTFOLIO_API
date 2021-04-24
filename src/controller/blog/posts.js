@@ -45,8 +45,8 @@ class PostController {
   }
   static async getPosts(req, res) {
     try {
-      const page = parseInt(req.query.page);
-      const limit = parseInt(req.query.limit);
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
 
       const startIndex = (page - 1) * limit;
       const endIndex = page * limit;
@@ -167,25 +167,64 @@ class PostController {
   }
   static async getPostsByCategory(req, res) {
     try {
-      const category = await Category.find({ name: req.params.category });
-      if (!category)
-        return res.status(400).json({ error: "Category not found" });
-      const posts = await Post.find({ category: req.params.category });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+
+      const startIndex = (page - 1) * limit;
+      const endIndex = page * limit;
+
+      const results = {};
+
+      const category = await Category.findOne({ name: req.params.category });
+      if (!category) {
+        return res.status(400).json({ error: "Can't fing what you are looking for :(" });
+      }
+      const posts = await Post.find({ category: category._id});
       if (!posts) return res.status(400).json({ error: "No results found!" });
-      res
+     
+      if (endIndex < posts.length) {
+        results.next = {
+          page: page + 1,
+          limit: limit,
+        };
+      } else {
+        results.next = {
+          page: null,
+          limit: limit,
+        };
+      }
+
+      results.maxPages = Math.ceil(posts.length / limit);
+      for (let i = 0; i < 2; i++) {
+        if (startIndex > 0) {
+          results.previous = {
+            page: page - 1,
+            limit: limit,
+          };
+        } else {
+          results.previous = {
+            page: null,
+            limit: limit,
+          };
+        }
+      }
+      results.results = posts.slice(startIndex,startIndex + limit);
+      return res
         .status(200)
-        .json({ message: "Posts retrieved successfuly", posts: posts });
-    } catch (err) {
-      res.status(400).json({ error: "Can't find posts with that category" });
+        .json({ message: "Posts fetched successfuly", postsPerPage: results , posts: posts});
+      
+    } catch (error) {
+      return res.status(400).json({ error: "Something went wrong", err:error });
     }
   }
   static async createPostCat(req, res) {
-    const cat = new Category({
-      name: req.body.name,
-      description: req.body.description,
-      createdBy: req.user.id,
-    });
+   
     try {
+      const cat = new Category({
+        name: req.body.name,
+        description: req.body.description,
+        createdBy: req.user.id,
+      });
       await cat.save();
       return res
         .status(201)
@@ -208,20 +247,17 @@ class PostController {
         },
         { useFindAndModify: false }
       );
-      return res.status(201).json({ msg: "Category is updated successfuly" });
+      return res.status(201).json({ msg: "Category updated successfuly" });
     } catch (error) {
-      return res.status(400).json({ error: "Failed to update category" });
+      return res.status(400).json({ error: "Something went wrong" , err:error});
     }
   }
   static async deleteCategory(req, res) {
     try {
-      await Category.findOneAndDelete(
-        { _id: req.params.category },
-        { useFindAndModify: false }
-      );
-      return res.status(201).json({ msg: "Category deleted successfuly" });
+      await req.category.deleteOne();
+      return res.status(201).json({ msg: "Category deleted successfully" });
     } catch (error) {
-      return res.status(400).json({ error: "Something went wrong" });
+      return res.status(400).json({ error: "Something went wrong", err:error });
     }
   }
   static async getPostCats(req, res) {
@@ -237,19 +273,12 @@ class PostController {
   }
   static async getPostCat(req, res) {
     try {
-      const category = await Category.findOne({
-        _id: req.params.category,
-      });
-      if (!category)
-        return res.status(404).json({
-          error: "Category not found",
-        });
       return res.status(200).json({
         msg: "Post category fetched successfuly",
-        category: category,
+        category: req.category,
       });
     } catch (error) {
-      return res.status(400).json({ error: "Failed to get post category" });
+      return res.status(400).json({ error: "Something went wrong" , err:error });
     }
   }
 
@@ -534,7 +563,6 @@ class PostController {
       results.maxPages = Math.ceil(posts.length / limit);
       for (let i = 0; i < 2; i++) {
         if (startIndex > 0) {
-          // results.previous.push(page - 1);
           results.previous = {
             page: page - 1,
             limit: limit,

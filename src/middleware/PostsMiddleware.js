@@ -16,7 +16,7 @@ class PostsMiddleware {
 
       next();
     } catch (error) {
-      return res.status(400).json({ error: "Something went wrong" })
+      return res.status(400).json({ error: "Something went wrong" , err:error})
     }
   }
   static async checkOwner(req, res, next) {
@@ -26,16 +26,20 @@ class PostsMiddleware {
       }
       next();
     } catch (error) {
-      return res.status(400).json({ error: "Something went wrong" })
+      return res.status(400).json({ error: "Something went wrong" , err:error })
     }
   }
   static async checkPostCommentReply(req, res, next) {
-    const commentReply = await CommentReply.findById(req.params.replyId);
+    try{
+      const commentReply = await CommentReply.findById(req.params.replyId);
     if (!commentReply)
       return res.status(404).json({ error: "Reply not found" });
     if (commentReply.user._id != req.user.id)
       return res.status(401).json({ error: "Unauthorized request" });
-    next();
+    next();      
+    }catch(error){
+      return res.status(400).json({ error: "Something went wrong" , err:error})
+    }
   }
 
   static async postExist(req, res, next) {
@@ -70,22 +74,14 @@ class PostsMiddleware {
       return res.status(400).json({ error: "Something went wrong", err:error })
     }
   }
-  static async checkCategory(req, res, next) {
-    try {
-      const category = await Category.findOne({ name: req.body.name });
-      if (category) return res.status(400).json({ error: "Name already exist" });
-      next();
-    } catch (error) {
-      return res.status(400).json({ error: "Something went wrong" })
-    }
-  }
   static async checkCategoryUpdate(req, res, next) {
     try {
       const category = await Category.findOne({ _id: req.params.category });
       if (!category) return res.status(404).json({ error: "Category not found" });
+      req.category = category;
       next();
     } catch (error) {
-      return res.status(400).json({ error: "Something went wrong" })
+      return res.status(400).json({ error: "Something went wrong", err : error })
     }
   }
   static async checkCatCreation(req, res, next) {
@@ -94,9 +90,10 @@ class PostsMiddleware {
       if (category) {
         return res.status(400).json({ error: "Category name already exist" });
       }
+      req.category = category;
       next();
     } catch (error) {
-      return res.status(400).json({ error: "Something went wrong" })
+      return res.status(400).json({ error: "Something went wrong" , err: error })
     }
   }
   static async checkPostTitle(req, res, next) {
@@ -109,7 +106,7 @@ class PostsMiddleware {
       req.title = title;
       next();
     } catch (error) {
-      return res.status(400).json({ error: "Something went wrong" })
+      return res.status(400).json({ error: "Something went wrong" , err: error})
     }
   }
 }
