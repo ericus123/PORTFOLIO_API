@@ -8,7 +8,7 @@ import Category from "../../model/Category";
 import dotenv from "dotenv";
 import ReplyReaction from "../../model/CommentReplyReactions";
 import BlogVideo from "../../model/BlogVideos";
-import { uploadImage, deleteImage } from "../../helpers/images/index"
+import { uploadImage, deleteImage } from "../../helpers/images/index";
 
 dotenv.config();
 
@@ -505,7 +505,7 @@ class PostController {
 
       const results = {};
 
-      const query = req.query.term;
+      const query = req.query.term.trim();
       if (!query) {
         return res.status(400).json({ error: "Search term is required" });
       }
@@ -549,6 +549,7 @@ class PostController {
       results.results = posts.slice(startIndex,startIndex + limit);
       return res.status(200).json({
         msg: "Search results retrieved successfuly",
+        term: query,
         postsPerPage: results,
         posts: posts,
       });
