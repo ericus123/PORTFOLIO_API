@@ -64,10 +64,12 @@ class PostController {
           limit: limit,
         };
       }
-      results.previous = [];
       for (let i = 0; i < 2; i++) {
         if (startIndex > 0) {
-          results.previous.push(page - 1);
+          results.previous = {
+            page: page - 1,
+            limit: limit,
+          };
         } else {
           results.previous = {
             page: null,
@@ -495,6 +497,14 @@ class PostController {
   }
   static async searchPosts(req, res) {
     try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+
+      const startIndex = (page - 1) * limit;
+      const endIndex = page * limit;
+
+      const results = {};
+
       const query = req.query.term;
       if (!query) {
         return res.status(400).json({ error: "Search term is required" });
@@ -508,10 +518,38 @@ class PostController {
             },
           },
         },
-      ]);
+      ])  
+      if (endIndex < posts.length) {
+        results.next = {
+          page: page + 1,
+          limit: limit,
+        };
+      } else {
+        results.next = {
+          page: null,
+          limit: limit,
+        };
+      }
 
+      results.maxPages = Math.ceil(posts.length / limit);
+      for (let i = 0; i < 2; i++) {
+        if (startIndex > 0) {
+          // results.previous.push(page - 1);
+          results.previous = {
+            page: page - 1,
+            limit: limit,
+          };
+        } else {
+          results.previous = {
+            page: null,
+            limit: limit,
+          };
+        }
+      }
+      results.results = posts.slice(startIndex,startIndex + limit);
       return res.status(200).json({
         msg: "Search results retrieved successfuly",
+        postsPerPage: results,
         posts: posts,
       });
     } catch (error) {
@@ -544,7 +582,6 @@ class PostController {
   static async updateBlogVideo(req, res) {
     try {
       const video = await BlogVideo.findById(req.params.id);
-      console.log(video);
       if (!video) {
         return res.status(404).json({ error: "Video not found" });
       }
