@@ -8,7 +8,7 @@ import Category from "../../model/Category";
 import dotenv from "dotenv";
 import ReplyReaction from "../../model/CommentReplyReactions";
 import BlogVideo from "../../model/BlogVideos";
-import { uploadImage, deleteImage } from "../../helpers/images/index"
+import { uploadImage, deleteImage } from "../../helpers/images/index";
 
 dotenv.config();
 

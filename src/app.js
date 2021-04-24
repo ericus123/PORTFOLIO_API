@@ -10,6 +10,7 @@ import postRoute from "./routes/blog/posts";
 import newsLetterRoute from "./routes/subscriptions/newsLetter";
 import blogVideosRoute from "./routes/blog/videos";
 import messageRoute from "./routes/queries/messages";
+import homeRoute from "./routes/homepage/homepage";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -63,6 +64,7 @@ app.use("/api/subscriptions/newsletter", newsLetterRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/blog", blogVideosRoute);
 app.use("/api/emails", emailRoute);
+app.use("/api/home", homeRoute);
 app.use("/api/messages", messageRoute);
 app.use("/", (req, res) => {
   res.status(200).json({ message: "Hello ! Welcome on our website " });
