@@ -424,7 +424,7 @@ export const categoryValidation = (req, res, next) => {
       .regex(/[a-zA-Z0-9]/)
       .required()
       .messages({
-        "string.base": "Name must contain letters and numbers only",
+        "string.base": "Name must be a string of characters",
         "string.empty": "Please fill in the name",
         "string.min": "Name must be at least {#limit} characters long",
         "string.max": "Name must be below {#limit} characters long",
@@ -474,6 +474,79 @@ export const messageValidation = (req, res, next) => {
         "any.required": "Message is required",
         "string.pattern.base": "Please provide a meaningful message",
       }),
+  });
+  const { error } = schema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+  next();
+};
+
+export const createWorkValidation = (req, res, next) => {
+  const schema = Joi.object({
+    title: Joi.string().min(5).max(50).required().messages({
+      "string.base": "Work title must contain words",
+      "string.empty": "Please fill in the work title",
+      "string.min": "Work title must be at least {#limit} characters long",
+      "any.required": "Work title is required",
+      "string.max": "Work title must be less than  {#limit} characters long",
+    }),
+    web_url: Joi.string().trim().uri().required().messages({
+      "string.base": "Please provide a valid url",
+      "string.empty": "Provide a web url",
+      "string.uri": "Please provide a valid web url",
+      "any.required": "Web url is required",
+    }),
+    codebase_backend: Joi.string().trim().uri().required().messages({
+      "string.base": "Please provide a valid codebase backend url",
+      "string.empty": "Provide a codebase backend url",
+      "string.uri": "Please provide a valid codebase backend url",
+      "any.required": "Codebase backend url is required",
+    }),
+    codebase_front_end: Joi.string().trim().uri().required().messages({
+      "string.base": "Please provide a valid codebase frontend url",
+      "string.empty": "Provide a codebase frontend url",
+      "string.uri": "Please provide a valid codebase frontend url",
+      "any.required": "Codebase frontend url is required",
+    }),
+    image: Joi.string().required().messages({
+      "string.empty": "Work image is required",
+      "any.required": "Work image is required",
+    }),
+  });
+  const { error } = schema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+  next();
+};
+export const updateWorkValidation = (req, res, next) => {
+  const schema = Joi.object({
+    title: Joi.string().min(5).max(50).required().messages({
+      "string.base": "Work title must contain words",
+      "string.empty": "Please fill in the work title",
+      "string.min": "Worktitle must be at least {#limit} characters long",
+      "any.required": "Work title is required",
+      "string.max": "Work title must be less than  {#limit} characters long",
+    }),
+    web_url: Joi.string().trim().uri().required().messages({
+      "string.base": "Please provide a valid url",
+      "string.empty": "Provide a web url",
+      "string.uri": "Please provide a valid web url",
+      "any.required": "Web url is required",
+    }),
+    codebase_backend: Joi.string().trim().uri().required().messages({
+      "string.base": "Please provide a valid codebase backend url",
+      "string.empty": "Provide a codebase backend url",
+      "string.uri": "Please provide a valid codebase backend url",
+      "any.required": "Codebase backend url is required",
+    }),
+    codebase_front_end: Joi.string().trim().uri().required().messages({
+      "string.base": "Please provide a valid codebase frontend url",
+      "string.empty": "Provide a codebase frontend url",
+      "string.uri": "Please provide a valid codebase frontend url",
+      "any.required": "Codebase frontend url is required",
+    }),
+    image: Joi.string().messages({
+      "string.empty": "Work image is required",
+      "any.required": "Work image is required",
+    }),
   });
   const { error } = schema.validate(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
