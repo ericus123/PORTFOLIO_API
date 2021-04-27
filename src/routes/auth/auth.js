@@ -17,8 +17,8 @@ authRoute.get(
   AuthController.CheckLogin
 );
 authRoute.put(
-  "/verify/:email/:token",
-  NewsLetterMiddleware.checkEmail,
+  "/verify/:email",
+  AuthMiddleware.checkAccessToken,
   AuthMiddleware.isNotVerified,
   AuthController.ConfEmail
 );
@@ -41,8 +41,8 @@ authRoute.patch(
   AuthController.changePassword
 );
 authRoute.put(
-  "/password/reset/:email/:token",
-  NewsLetterMiddleware.checkEmail,
+  "/password/reset/:email",
+  AuthMiddleware.checkAccessToken,
   AuthMiddleware.isVerified,
   PassResetValidation,
   AuthController.ResetPassword

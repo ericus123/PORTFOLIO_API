@@ -152,13 +152,30 @@ export const uploadImageValidation = (req, res, next) => {
 };
 export const completeProfileValidation = (req, res, next) => {
   const schema = Joi.object({
+    occupation: Joi.string()
+      .min(3)
+      .max(30)
+      .regex(/[a-zA-Z]/)
+      .required()
+      .messages({
+        "string.base": "Occupation must contain letters only ",
+        "string.empty": "Please fill in your occupation",
+        "string.min": "Occupation must be at least {#limit} characters long",
+        "string.max": "Occupation must be below {#limit} characters long",
+        "any.required": "Occupation is required",
+      }),
+    gender: Joi.string().valid("Male", "Female", "Prefer Not To Answer").required().messages({
+      "string.base": "Gender must contain letters only ",
+      "string.empty": "Please fill in your gender",
+      "any.required": "Gender is required",
+    }),   
     img: Joi.string().required().messages({
       "string.empty": "Profile image is required",
       "any.required": "Profile image is required",
     }),
     bio: Joi.string()
       .min(10)
-      .max(40)
+      .max(400)
       .regex(/[a-zA-Z]/)
       .required()
       .messages({
@@ -175,6 +192,30 @@ export const completeProfileValidation = (req, res, next) => {
 };
 export const profileUpdateValidation = (req, res, next) => {
   const schema = Joi.object({
+    firstName: Joi.string()
+    .min(3)
+    .max(12)
+    .regex(/[a-zA-Z]/)
+    .required()
+    .messages({
+      "string.base": "First name must contain letters only ",
+      "string.empty": "Please fill in your first name",
+      "string.min": "Fisrt name must be at least {#limit} characters long",
+      "string.max": "First name must be below {#limit} characters long",
+      "any.required": "Firstname is required",
+    }),
+  lastName: Joi.string()
+    .min(3)
+    .max(12)
+    .regex(/[a-zA-Z]/)
+    .required()
+    .messages({
+      "string.base": "Last name must contain letters only ",
+      "string.empty": "Please fill in your last name",
+      "string.min": "Last name must be at least {#limit} characters long",
+      "string.max": "Last name must be below {#limit} characters long",
+      "any.required": "Lastname is required",
+    }),
     username: Joi.string()
       .min(3)
       .max(12)
@@ -187,9 +228,26 @@ export const profileUpdateValidation = (req, res, next) => {
         "string.max": "Username must be below {#limit} characters long",
         "any.required": "Username is required",
       }),
+    occupation: Joi.string()
+      .min(3)
+      .max(30)
+      .regex(/[a-zA-Z]/)
+      .required()
+      .messages({
+        "string.base": "Occupation must contain letters only ",
+        "string.empty": "Please fill in your occupation",
+        "string.min": "Occupation must be at least {#limit} characters long",
+        "string.max": "Occupation must be below {#limit} characters long",
+        "any.required": "Occupation is required",
+      }),
+      gender: Joi.string().valid("Male", "Female", "Prefer Not To Answer").required().messages({
+      "string.base": "Gender must contain letters only ",
+      "string.empty": "Please fill in your gender",
+      "any.required": "Gender is required",
+    }),  
     bio: Joi.string()
       .min(10)
-      .max(40)
+      .max(400)
       .regex(/[a-zA-Z]/)
       .required()
       .messages({
@@ -199,34 +257,6 @@ export const profileUpdateValidation = (req, res, next) => {
         "string.max": "Bio must be below {#limit} characters long",
         "any.required": "Bio is required",
       }),
-    firstName: Joi.string()
-      .min(3)
-      .max(12)
-      .regex(/[a-zA-Z]/)
-      .required()
-      .messages({
-        "string.base": "First name must contain letters only ",
-        "string.empty": "Please fill in your first name",
-        "string.min": "Fisrt name must be at least {#limit} characters long",
-        "string.max": "First name must be below {#limit} characters long",
-        "any.required": "Firstname is required",
-      }),
-    lastName: Joi.string()
-      .min(3)
-      .max(12)
-      .regex(/[a-zA-Z]/)
-      .required()
-      .messages({
-        "string.base": "Last name must contain letters only ",
-        "string.empty": "Please fill in your last name",
-        "string.min": "Last name must be at least {#limit} characters long",
-        "string.max": "Last name must be below {#limit} characters long",
-        "any.required": "Lastname is required",
-      }),
-    img: Joi.string().required().messages({
-      "string.empty": "Profile image is required",
-      "any.required": "Profile image is required",
-    }),
   });
   const { error } = schema.validate(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
