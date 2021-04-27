@@ -34,6 +34,12 @@ authRoute.post(
   AuthMiddleware.isVerified,
   AuthController.SendPassResetLink
 );
+authRoute.patch(
+  "/password/change",
+  AuthMiddleware.checkToken,
+  PassResetValidation,
+  AuthController.changePassword
+);
 authRoute.put(
   "/password/reset/:email/:token",
   NewsLetterMiddleware.checkEmail,
