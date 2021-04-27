@@ -152,6 +152,18 @@ export const uploadImageValidation = (req, res, next) => {
 };
 export const completeProfileValidation = (req, res, next) => {
   const schema = Joi.object({
+    occupation: Joi.string()
+      .min(3)
+      .max(30)
+      .regex(/[a-zA-Z]/)
+      .required()
+      .messages({
+        "string.base": "Occupation must contain letters only ",
+        "string.empty": "Please fill in your occupation",
+        "string.min": "Occupation must be at least {#limit} characters long",
+        "string.max": "Occupation must be below {#limit} characters long",
+        "any.required": "Occupation is required",
+      }),
     img: Joi.string().required().messages({
       "string.empty": "Profile image is required",
       "any.required": "Profile image is required",
@@ -186,6 +198,18 @@ export const profileUpdateValidation = (req, res, next) => {
         "string.min": "Username must be at least {#limit} characters long",
         "string.max": "Username must be below {#limit} characters long",
         "any.required": "Username is required",
+      }),
+    occupation: Joi.string()
+      .min(3)
+      .max(30)
+      .regex(/[a-zA-Z]/)
+      .required()
+      .messages({
+        "string.base": "Occupation must contain letters only ",
+        "string.empty": "Please fill in your occupation",
+        "string.min": "Occupation must be at least {#limit} characters long",
+        "string.max": "Occupation must be below {#limit} characters long",
+        "any.required": "Occupation is required",
       }),
     bio: Joi.string()
       .min(10)

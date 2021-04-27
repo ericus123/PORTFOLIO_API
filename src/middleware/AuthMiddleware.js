@@ -11,7 +11,18 @@ class AuthMiddleware {
       req.user = verified;
       next();
     } catch (err) {
-      res.status(400).send({ error: "Invalid Token" });
+      return res.status(400).send({ error: "Invalid Token" });
+    }
+  }
+  static async checkAccessToken(req, res, next) {
+    const token = req.header("access-token");
+    if (!token) return res.status(401).json({ error: "Unauthorized request" });
+    try {
+      const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+      req.token = verified;
+      next();
+    } catch (err) {
+     return res.status(400).send({ error: "Invalid Token" });
     }
   }
   static async checkAdmin(req, res, next) {
@@ -22,12 +33,17 @@ class AuthMiddleware {
     }
   }
   static async checkSuperAdmin(req, res, next) {
+  try{
     if (req.user.role != "superAdmin")
-      return res.status(401).json({ error: "Access denied" });
+    return res.status(401).json({ error: "Access denied" });
     next();
+  } catch (error) {
+    return res.status(400).json({ error: "Something went wrong" , err: error })
+  }
   }
 
   static async isNotVerified(req, res, next) {
+    try{
     const email = req.body.email ? req.body.email : req.params.email;
     const user = await User.findOne({ email: email });
     if (!user) {
@@ -40,8 +56,12 @@ class AuthMiddleware {
     }
     req.user = user;
     next();
+  } catch (error) {
+    return res.status(400).json({ error: "Something went wrong" , err: error })
+  }
   }
   static async isVerified(req, res, next) {
+    try{
     const email = req.body.email ? req.body.email : req.params.email;
     const user = await User.findOne({ email: email });
     if (!user) {
@@ -54,8 +74,12 @@ class AuthMiddleware {
     }
     req.user = user;
     next();
+  } catch (error) {
+    return res.status(400).json({ error: "Something went wrong" , err: error })
+  }
   }
   static async profileIsIncomplete(req, res, next) {
+    try{
     const { id } = req.user;
     const user = await User.findOne({ _id: id });
     if (!user) {
@@ -69,14 +93,21 @@ class AuthMiddleware {
     }
     req.profile = user;
     next();
+  } catch (error) {
+    return res.status(400).json({ error: "Something went wrong" , err: error })
+  }
   }
   static async checkEmail(req, res, next) {
+    try{
     const email = req.body.email ? req.body.email : req.params.email;
     const { valid } = validate(email);
     if (!valid) {
       return res.status(400).json({ error: "Email is invalid" });
     }
     next();
+  } catch (error) {
+    return res.status(400).json({ error: "Something went wrong" , err: error })
+  }
   }
 }
 export default AuthMiddleware;

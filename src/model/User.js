@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  occupation: {
+    type: String,
+    default: null,
+  },
   isVerified: {
     type: Boolean,
     default: false,
