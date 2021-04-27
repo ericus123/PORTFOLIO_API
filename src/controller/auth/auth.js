@@ -39,6 +39,8 @@ class AuthController {
         firstName: login.firstName,
         lastName: login.lastName,
         avatar: login.avatar,
+        isComplete:login.isComplete,
+        avatar_public_id: login.avatar_public_id
       },
       process.env.TOKEN_SECRET,
       { expiresIn: "2h" }

@@ -139,7 +139,17 @@ export const validateEmail = (req, res, next) => {
 
 
 
-
+export const uploadImageValidation = (req, res, next) => {
+  const schema = Joi.object({
+    image: Joi.string().required().messages({
+      "string.empty": "Profile image is required",
+      "any.required": "Profile image is required",
+    })
+  });
+  const { error } = schema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+  next();
+};
 export const completeProfileValidation = (req, res, next) => {
   const schema = Joi.object({
     img: Joi.string().required().messages({

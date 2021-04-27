@@ -83,5 +83,32 @@ class ProfileController {
       return res.status(500).json({ error: "Something went wrong", err: error })
     }
   }
+  static async changeProfileImage(req,res){
+    try{
+      const {image} = req.body;
+      const {avatar_public_id, id, isComplete} = req.user;
+
+      if(!isComplete){
+      return res.status(400).json({error:"You need to complete your profile first"});
+      }
+
+      const uploaded_image = await uploadImage(image, "/Users/Avatars");
+      await deleteImage(avatar_public_id)
+
+    await User.findByIdAndUpdate(
+      id,
+      {
+        $set:{
+          avatar:uploaded_image.secure_url,
+          avatar_public_id:uploaded_image.public_id
+        }
+      },
+      {useFindAndModify:false}
+    );
+    return res.status(201).json({msg:"Profile image changed successfully"});
+  }catch(error){
+  return res.status(500).json({error:"Something went wrong", err:error})
+  }
+ }
 }
 export default ProfileController;
