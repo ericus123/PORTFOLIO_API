@@ -21,9 +21,15 @@ profileRoute.patch(
   ProfileController.changeProfileImage
 );
 profileRoute.get("/", AuthMiddleware.checkToken, ProfileController.viewProfile);
+profileRoute.post(
+  "/delete-token",
+  AuthMiddleware.checkToken,
+  ProfileController.genAcctDelToken
+);
 profileRoute.delete(
   "/",
   AuthMiddleware.checkToken,
+  AuthMiddleware.checkAccessToken,
   ProfileController.deleteAccount
 );
 
