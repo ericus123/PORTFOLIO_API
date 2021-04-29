@@ -1,6 +1,9 @@
 import User from "../../model/User";
 import dotenv from "dotenv";
-import { uploadImage, deleteImage } from "../../helpers/images/index"
+import { uploadImage, deleteImage } from "../../helpers/images/index";
+import { generateToken } from "../../helpers/tokens";
+import { sendEmail, setEmail } from "../../helpers/emails";
+import { accountDeletion } from "../../helpers/emails/templates";
 dotenv.config();
 
 
@@ -38,6 +41,8 @@ class ProfileController {
       });
     }
   }
+
+ 
   static async viewProfile(req, res) {
     try {
       const user = await User.findOne({
@@ -73,12 +78,47 @@ class ProfileController {
     }
   }
 
+   static async genAcctDelToken(req,res){
+  
+      try{
+        const user = await User.findOne({ email: req.user.email });
+        if (!user) return res.status(404).json({ error: "User not found" });
+        const token =  await
+          generateToken({email:user.email},"5m");
+          const url = `${process.env.FRONTEND_URL}/account/delete/${token}`;
+          const {firstName} = req.user;
+          await sendEmail(
+            setEmail(
+              process.env.EMAIL,
+              user.email,
+              " Delete Account",
+              accountDeletion(firstName, url )
+            )
+          ).then((result) => {         
+              return res.status(201).json({msg:`An account deletion email has been sent to ${req.user.email} and it expires in 5 mins . Open that link to delete your account .`});         
+          }).catch((error) => {
+            return res.status(500).json({
+              msg: err.message,
+              error: "Can't send email, try again",
+              err: error
+            });
+          });
+        
+      }catch(error){
+        return res.status(500).json({ error: "Something went wrong", err: error })
+      }
+  }
+  
   static async deleteAccount(req, res) {
     try {
+       const {email} = req.token;
+      if(req.user.email !== email){
+        return res.status(401).json({error:"Unauthorized request"});
+      }
       const user = await User.findOne({ email: req.user.email });
       if (!user) return res.status(404).json({ error: "User not found" });
-      await user.delete();
-      await deleteImage(user.avatar_public_id);
+       await deleteImage(req.user.avatar_public_id);
+      await user.delete();  
       return res.status(201).json({ msg: "Account deleted successfuly" });
     } catch (error) {
       return res.status(500).json({ error: "Something went wrong", err: error })
