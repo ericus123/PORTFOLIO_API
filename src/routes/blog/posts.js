@@ -32,6 +32,7 @@ postRoute.get(
   PostController.getPostReactions
 );
 postRoute.get("/", PostController.getPosts);
+postRoute.get("/all", PostController.getPostsAll);
 postRoute.get("/categories", PostController.getPostCats);
 postRoute.post(
   "/category",
@@ -57,12 +58,18 @@ postRoute.delete(
   PostsMiddleware.checkCategoryUpdate,
   PostController.deleteCategory
 );
-postRoute.get("/category/:category",
- PostsMiddleware.checkCategoryUpdate,
- PostController.getPostCat);
+postRoute.get(
+  "/category/:category",
+  PostsMiddleware.checkCategoryUpdate,
+  PostController.getPostCat
+);
 
 postRoute.get("/search", PostController.searchPosts);
-postRoute.get("/categories/:category", PostsMiddleware.checkCatCreation, PostController.getPostsByCategory);
+postRoute.get(
+  "/categories/:category",
+  PostsMiddleware.checkCatCreation,
+  PostController.getPostsByCategory
+);
 postRoute.get("/:id", PostController.getPost);
 postRoute.patch(
   "/:id",
@@ -100,10 +107,7 @@ postRoute.get(
   PostsMiddleware.postExist,
   PostController.getComments
 );
-postRoute.get(
-  "/comments/single/:commentId",
-  PostController.getComment
-);
+postRoute.get("/comments/single/:commentId", PostController.getComment);
 postRoute.delete(
   "/comments/:commentId",
   AuthMiddleware.checkToken,
@@ -151,6 +155,5 @@ postRoute.post(
   PostsMiddleware.replyExist,
   PostController.reactToThePostCommentReply
 );
-
 
 export default postRoute;

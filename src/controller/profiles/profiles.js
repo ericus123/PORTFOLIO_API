@@ -59,12 +59,9 @@ class ProfileController {
   static async completeProfile(req, res) {
     try {
       const { bio, img , occupation, gender } = req.body;
-      const uploaded_image = await uploadImage(img, "/Users/Avatars")
       const updatedUser = await req.profile.updateOne({
         $set: {
           bio: bio,
-          avatar: uploaded_image.secure_url,
-          avatar_public_id: uploaded_image.public_id,
           occupation: occupation,
           gender: gender,
           isComplete: true,
@@ -117,7 +114,10 @@ class ProfileController {
       }
       const user = await User.findOne({ email: req.user.email });
       if (!user) return res.status(404).json({ error: "User not found" });
-       await deleteImage(req.user.avatar_public_id);
+
+      if(user.isComplete){
+         await deleteImage(req.user.avatar_public_id);
+      }
       await user.delete();  
       return res.status(201).json({ msg: "Account deleted successfuly" });
     } catch (error) {
@@ -132,13 +132,11 @@ class ProfileController {
       if(!user){
         return res.status(404).json({error:"User not found"});
       }
-      const {avatar_public_id, isComplete} = user;
-      if(!isComplete){
-      return res.status(400).json({error:"You need to complete your profile first"});
-      }
-
+      const {avatar_public_id} = user;
       const uploaded_image = await uploadImage(image, "/Users/Avatars");
-      await deleteImage(avatar_public_id)
+
+      avatar_public_id ? await deleteImage(avatar_public_id) : null
+      
       user.avatar = uploaded_image.secure_url;
       user.avatar_public_id = uploaded_image.public_id;
       await user.save();

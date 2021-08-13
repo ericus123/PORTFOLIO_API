@@ -2,11 +2,13 @@ import { Router } from "express";
 import NewsLetterController from "../../controller/subscriptions/newsLetter";
 import NewsLetterMiddleware from "../../middleware/subscriptions/newsLetter";
 import AuthMiddleware from "../../middleware/AuthMiddleware";
+import { PassResetEmailValidation } from "../../middleware/validation";
 
 const newsLetterRoute = new Router();
 
 newsLetterRoute.post(
-  "/subscribe/:email",
+  "/subscribe",
+  PassResetEmailValidation,
   NewsLetterMiddleware.checkEmail,
   NewsLetterController.subscribe
 );

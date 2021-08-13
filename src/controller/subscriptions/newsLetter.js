@@ -3,7 +3,7 @@ import NewsLetter from "../../model/NewsLetter";
 class NewsLetterController {
   static async subscribe(req, res) {
     try {
-      const { email } = req.params;
+      const { email } = req.body;
       const subscribed = await NewsLetter.findOne({ email: email });
       if (subscribed) {
         return res.status(400).json({ error: "You've already subscribed" });

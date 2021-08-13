@@ -13,19 +13,23 @@ dotenv.config();
 
 class AuthController {
   static async Login(req, res) {
+    const { email, password } = req.body;
     //Check credentials
     const user = await User.findOne({ email: req.body.email });
     if (!user) return res.status(400).json({ error: "Incorrect credentials" });
-    const validPass = await bcrypt.compare(req.body.password, user.password);
-    if (!validPass)
-      return res.status(400).json({ error: "Incorrect credentials" });
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(400).json({ error: "Incorrect credentials" });
+   
 
     const login = await User.findOne({
       email: req.body.email,
       password: user.password,
     });
 
-    if (!login) return res.status(400).json({ error: "Incorrect credentials" });
+    if (!login) return res.status(400).json({err:"not found", error: "Incorrect credentials" });
     if (!user.isVerified)
       return res
         .status(400)
@@ -40,13 +44,12 @@ class AuthController {
       firstName: login.firstName,
       lastName: login.lastName,
       avatar: login.avatar,
-      isComplete:login.isComplete,
-      avatar_public_id: login.avatar_public_id
-    }
+      isComplete: login.isComplete,
+      avatar_public_id: login.avatar_public_id,
+    };
 
-    const token =  await
-      generateToken(data,"2h");
-    
+    const token = await generateToken(data, "2h");
+
     return res.status(200).json({
       msg: "logged in successfuly",
       token: token,
@@ -72,9 +75,9 @@ class AuthController {
       });
 
       await user.save();
-      const token =  await
-      generateToken({email:user.email},"5m");
-    
+      const token = await generateToken({ email: user.email }, "5m");
+      console.log(token);
+
       const url = `${process.env.FRONTEND_URL}/account/verify/${user.email}/${token}`;
       const name = firstName;
       await sendEmail(
@@ -84,19 +87,21 @@ class AuthController {
           "Confirm Email",
           confirmEmail({ name, url })
         )
-      ).then((result) => {
-        return res.status(200).json({
-          msg: `Verification email has been sent to ${email}. It expires in 5 mins`,
-          email: email,
-          token: token,
+      )
+        .then((result) => {
+          return res.status(200).json({
+            msg: `Verification email has been sent to ${email}. It expires in 5 mins`,
+            email: email,
+            token: token,
+          });
+        })
+        .catch((error) => {
+          return res.status(500).json({
+            msg: err.message,
+            error: "Can't send verification email, try again",
+            err: error,
+          });
         });
-      }).catch((error) => {
-        return res.status(500).json({
-          msg: err.message,
-          error: "Can't send verification email, try again",
-          err: error
-        });
-      });
     } catch (error) {
       return res
         .status(400)
@@ -106,11 +111,10 @@ class AuthController {
 
   static async ConfEmail(req, res) {
     try {
-      
-      const {email} = req.token;
-      
-      if(!req.user.email == email){
-        return res.status(401).json({error:"Unauthorized request"});
+      const { email } = req.token;
+
+      if (!req.user.email == email) {
+        return res.status(401).json({ error: "Unauthorized request" });
       }
       req.user.isVerified = true;
       await req.user.save();
@@ -127,10 +131,9 @@ class AuthController {
     try {
       const user = req.user;
       const { firstName, email } = user;
-      const token =  await
-      generateToken({email:user.email},"5m");
-     
-      const url = `${process.env.FRONTEND_URL}/account/verify/${user.email}/${token.token}`;
+      const token = await generateToken({ email: user.email }, "5m");
+
+      const url = `${process.env.FRONTEND_URL}/account/verify/${user.email}/${token}`;
       const name = firstName;
       await sendEmail(
         setEmail(
@@ -139,51 +142,53 @@ class AuthController {
           "Confirm Email",
           confirmEmail({ name, url })
         )
-      ).then((result) => {
-        return res.status(200).json({
-          msg: `Verification email has been sent to ${email}. It expires in 5 mins`,
-          email: email,
-          token: token,
+      )
+        .then((result) => {
+          return res.status(200).json({
+            msg: `Verification email has been sent to ${email}. It expires in 5 mins`,
+            email: email,
+            token: token,
+          });
+        })
+        .catch((error) => {
+          return res.status(500).json({
+            msg: err.message,
+            error: "Can't send verification email, try again",
+            err: error,
+          });
         });
-      }).catch((error) => {
-        return res.status(500).json({
-          msg: err.message,
-          error: "Can't send verification email, try again",
-          err: error
-        });
-      });
     } catch (error) {
       return res.status(500).json({ err: error, msg: "Something went wrong" });
     }
   }
   static async SendPassResetLink(req, res) {
     try {
-      const user = req.user;
-      const token =  await
-      generateToken({email:user.email},"5m");
+      const { firstName, email } = req.user;
+      const token = await generateToken({ email: email }, "5m");
 
-      const { firstName, email } = user;
-      const url = `${process.env.FRONTEND_URL}/password/reset/${email}/${token}`;
+      const url = `${process.env.FRONTEND_URL}/password/reset/user/${token}`;
       await sendEmail(
         setEmail(
           process.env.EMAIL,
-          user.email,
+          email,
           "Reset Password",
           resetPassword({ firstName, url })
         )
-      ).then((result) => {
-        return res.status(200).json({
-          msg: `Password reset link has been sent to ${email}. It expires in 5 mins`,
-          email: email,
-          token: token,
+      )
+        .then((result) => {
+          return res.status(200).json({
+            msg: `Password reset link has been sent to ${email}. It expires in 5 mins`,
+            email: email,
+            token: token,
+          });
+        })
+        .catch((error) => {
+          return res.status(500).json({
+            msg: err.message,
+            error: "Can't send password reset email, try again",
+            err: error,
+          });
         });
-      }).catch((error) => {
-        return res.status(500).json({
-          msg: err.message,
-          error: "Can't send password reset email, try again",
-          err: error
-        });
-      })
     } catch (error) {
       return res
         .status(400)
@@ -193,8 +198,12 @@ class AuthController {
   static async ResetPassword(req, res) {
     try {
       const { email } = req.token;
-      if(req.user.email !== email){
-        return res.status(401).json({error:"Unauthorized request"});
+       const user = await User.findOne({ email: email });
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      if (!user.isVerified) {
+        return res.status(400).json({ error: "Your account is not verified" });
       }
       const { password, passwordConf } = req.body;
 
@@ -203,7 +212,8 @@ class AuthController {
       }
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
-      await req.user.updateOne({ $set: { password: hashedPassword } });
+        user.password = hashedPassword;
+      await user.save();
       return res.status(201).json({ msg: "Password reset successfuly" });
     } catch (error) {
       return res
@@ -212,8 +222,8 @@ class AuthController {
     }
   }
   static async CheckLogin(req, res) {
-    const user = await User.findOne({_id:req.user.id});
-    if(!user){
+    const user = await User.findOne({ _id: req.user.id });
+    if (!user) {
       return res.status(404).json("User not found");
     }
     const userData = {
@@ -224,30 +234,32 @@ class AuthController {
       firstName: user.firstName,
       lastName: user.lastName,
       avatar: user.avatar,
-    }
+    };
     return res.status(200).json({ msg: "User is logged in", user: userData });
   }
-  static async changePassword(req,res){
-    try{
-      const {id} = req.user;
-      const {password, passwordConf} = req.body;
-      if(password !== passwordConf){
-        return res.status(400).json({error:"Passwords do not match"})
+  static async changePassword(req, res) {
+    try {
+      const { id } = req.user;
+      const { password, passwordConf } = req.body;
+      if (password !== passwordConf) {
+        return res.status(400).json({ error: "Passwords do not match" });
       }
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
       await User.findByIdAndUpdate(
         id,
         {
-          $set:{
-            password:hashedPassword
-          }
+          $set: {
+            password: hashedPassword,
+          },
         },
-        {useFindAndModify:false}
+        { useFindAndModify: false }
       );
-      return res.status(201).json({msg:"Password changed successfully"});
-    }catch(error){
-    return res.status(500).json({error:"Something went wrong", err:error})
+      return res.status(201).json({ msg: "Password changed successfully" });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error: "Something went wrong", err: error });
     }
   }
 }

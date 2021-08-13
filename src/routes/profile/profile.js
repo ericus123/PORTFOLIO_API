@@ -27,7 +27,7 @@ profileRoute.post(
   ProfileController.genAcctDelToken
 );
 profileRoute.delete(
-  "/",
+  "/:token",
   AuthMiddleware.checkToken,
   AuthMiddleware.checkAccessToken,
   ProfileController.deleteAccount

@@ -164,14 +164,10 @@ export const completeProfileValidation = (req, res, next) => {
         "string.max": "Occupation must be below {#limit} characters long",
         "any.required": "Occupation is required",
       }),
-    gender: Joi.string().valid("Male", "Female", "Prefer Not To Answer").required().messages({
+    gender: Joi.string().valid("Male", "Female", "Prefer Not To Say").required().messages({
       "string.base": "Gender must contain letters only ",
       "string.empty": "Please fill in your gender",
       "any.required": "Gender is required",
-    }),   
-    img: Joi.string().required().messages({
-      "string.empty": "Profile image is required",
-      "any.required": "Profile image is required",
     }),
     bio: Joi.string()
       .min(10)
@@ -316,7 +312,7 @@ export const PassResetEmailValidation = (req, res, next) => {
       "any.required": "Email is required",
     }),
   });
-  const { error } = schema.validate(req.body);
+  const { error } = schema.validate(req.body || req.params);
   if (error) return res.status(400).json({ error: error.details[0].message });
   next();
 };

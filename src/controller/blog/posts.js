@@ -42,6 +42,31 @@ class PostController {
       return res.status(500).json({ err: "Something went wrong", error: err });
     }
   }
+  static async getPostsAll(req, res) {
+    try {
+      const posts = await Post.find().populate([
+        "category",
+        {
+          path: "comments",
+          populate: {
+            path: "replies",
+          },
+        },
+        "likes",
+        "unLikes",
+        "category",
+        "author",
+      ]);
+
+      return res
+        .status(200)
+        .json({ msg: "Posts retrieved successfuly", posts: posts });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ err: error, error: "Something went wrong" });
+    }
+  }
   static async getPosts(req, res) {
     try {
       const page = parseInt(req.query.page) || 1;
@@ -99,18 +124,17 @@ class PostController {
 
   static async getPost(req, res) {
     const id = req.params.id;
-
     try {
       const singlepost = await Post.findById(id).populate([
         "category",
         {
           path: "comments",
+          model: "Comments",
           populate: {
             path: "replies",
           },
         },
         "likes",
-        "unLikes",
         "category",
         "author",
       ]);
@@ -213,13 +237,11 @@ class PostController {
         }
       }
       results.results = posts.slice(startIndex, startIndex + limit);
-      return res
-        .status(200)
-        .json({
-          message: "Posts fetched successfuly",
-          postsPerPage: results,
-          posts: posts,
-        });
+      return res.status(200).json({
+        message: "Posts fetched successfuly",
+        postsPerPage: results,
+        posts: posts,
+      });
     } catch (error) {
       return res
         .status(400)
@@ -274,7 +296,7 @@ class PostController {
   }
   static async getPostCats(req, res) {
     try {
-      const categories = await Category.find({});
+      const categories = await Category.find();
       return res.status(200).json({
         msg: "Post categories fetched successfuly",
         categories: categories,
@@ -364,18 +386,18 @@ class PostController {
           path: "replies",
           model: "CommentReplies",
           populate: {
-          path: "likes",
-          model: "ReplyReactions",
-        }
-      },
-         {
+            path: "likes",
+            model: "ReplyReactions",
+          },
+        },
+        {
           path: "replies",
           model: "CommentReplies",
           populate: {
-          path: "user",
-          model: "User",
+            path: "user",
+            model: "User",
+          },
         },
-      },
         "likes",
         "user",
       ]);
@@ -401,14 +423,14 @@ class PostController {
             model: "ReplyReactions",
           },
         },
-         {
+        {
           path: "replies",
           model: "CommentReplies",
           populate: {
-          path: "user",
-          model: "User",
+            path: "user",
+            model: "User",
+          },
         },
-      },
         "likes",
         "user",
       ]);
