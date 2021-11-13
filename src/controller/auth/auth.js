@@ -22,18 +22,67 @@ class AuthController {
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ error: "Incorrect credentials" });
-   
 
     const login = await User.findOne({
       email: req.body.email,
       password: user.password,
     });
 
-    if (!login) return res.status(400).json({err:"not found", error: "Incorrect credentials" });
+    if (!login)
+      return res
+        .status(400)
+        .json({ err: "not found", error: "Incorrect credentials" });
     if (!user.isVerified)
       return res
         .status(400)
         .json({ error: "Your account has not been verified" });
+    //create and assign a token
+
+    const data = {
+      role: login.role,
+      id: login._id,
+      username: login.username,
+      email: login.email,
+      firstName: login.firstName,
+      lastName: login.lastName,
+      avatar: login.avatar,
+      isComplete: login.isComplete,
+      avatar_public_id: login.avatar_public_id,
+    };
+
+    const token = await generateToken(data, "2h");
+
+    return res.status(200).json({
+      msg: "logged in successfuly",
+      token: token,
+    });
+  }
+
+  static async LoginAsAdmin(req, res) {
+    const { email, password } = req.body;
+    //Check credentials
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) return res.status(400).json({ error: "Incorrect credentials" });
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(400).json({ error: "Incorrect credentials" });
+
+    const login = await User.findOne({
+      email: req.body.email,
+      password: user.password,
+    });
+
+    if (!login)
+      return res
+        .status(400)
+        .json({ err: "not found", error: "Incorrect credentials" });
+    if (
+      !user.isVerified ||
+      (user.role !== "superAdmin" && user.role !== "admin")
+    )
+      return res.status(400).json({ error: "Unauthorized request" });
     //create and assign a token
 
     const data = {
@@ -198,7 +247,7 @@ class AuthController {
   static async ResetPassword(req, res) {
     try {
       const { email } = req.token;
-       const user = await User.findOne({ email: email });
+      const user = await User.findOne({ email: email });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -212,7 +261,7 @@ class AuthController {
       }
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
-        user.password = hashedPassword;
+      user.password = hashedPassword;
       await user.save();
       return res.status(201).json({ msg: "Password reset successfuly" });
     } catch (error) {

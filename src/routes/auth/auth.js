@@ -11,6 +11,7 @@ import NewsLetterMiddleware from "../../middleware/subscriptions/newsLetter";
 
 authRoute.post("/register", userValidation, AuthController.Signup);
 authRoute.post("/login", loginValidation, AuthController.Login);
+authRoute.post("/login-admin", loginValidation, AuthController.LoginAsAdmin);
 authRoute.get(
   "/check-login",
   AuthMiddleware.checkToken,
