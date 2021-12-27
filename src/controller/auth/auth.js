@@ -8,6 +8,7 @@ import crypto from "crypto";
 import { sendEmail, setEmail } from "../../helpers/emails";
 import { confirmEmail, resetPassword } from "../../helpers/emails/templates";
 import { generateToken } from "../../helpers/tokens";
+import { hashedPassword, randomString } from "../../helpers";
 
 dotenv.config();
 
@@ -125,7 +126,6 @@ class AuthController {
 
       await user.save();
       const token = await generateToken({ email: user.email }, "5m");
-      console.log(token);
 
       const url = `${process.env.FRONTEND_URL}/account/verify/${user.email}/${token}`;
       const name = firstName;
@@ -311,6 +311,59 @@ class AuthController {
         .json({ error: "Something went wrong", err: error });
     }
   }
+
+  static GoogleAuth = async (req, res) => {
+    console.log(req.body);
+    const { email, familyName, givenName } = req.body;
+
+    const login = await User.findOne({ email });
+    if (login) {
+      const data = {
+        role: login.role,
+        id: login._id,
+        username: login.username,
+        email: login.email,
+        firstName: login.firstName,
+        lastName: login.lastName,
+        avatar: login.avatar,
+        isComplete: login.isComplete,
+        avatar_public_id: login.avatar_public_id,
+      };
+
+      const token = await generateToken(data, "2h");
+
+      return res.status(200).json({
+        msg: "logged in successfuly",
+        token,
+      });
+    } else {
+      const user = await new User({
+        username: randomString(6),
+        firstName: givenName || "UNKNOWN",
+        lastName: familyName || "Unknown",
+        email: email,
+        password: await hashedPassword(randomString(10), 10),
+      });
+      await user.save();
+      const data = {
+        role: login.role,
+        id: login._id,
+        username: login.username,
+        email: login.email,
+        firstName: login.firstName,
+        lastName: login.lastName,
+        avatar: login.avatar,
+        isComplete: login.isComplete,
+        avatar_public_id: login.avatar_public_id,
+      };
+
+      const token = await generateToken(data, "2h");
+      return res.status(200).json({
+        msg: "logged in successfuly",
+        token,
+      });
+    }
+  };
 }
 
 export default AuthController;

@@ -70,7 +70,7 @@ postRoute.get(
   PostsMiddleware.checkCatCreation,
   PostController.getPostsByCategory
 );
-postRoute.get("/:id", PostController.getPost);
+postRoute.get("/:slug", PostController.getPost);
 postRoute.patch(
   "/:id",
   AuthMiddleware.checkToken,

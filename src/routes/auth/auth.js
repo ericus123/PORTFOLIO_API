@@ -8,6 +8,7 @@ import {
 import AuthController from "../../controller/auth/auth";
 import AuthMiddleware from "../../middleware/AuthMiddleware";
 import NewsLetterMiddleware from "../../middleware/subscriptions/newsLetter";
+import passport from "passport";
 
 authRoute.post("/register", userValidation, AuthController.Signup);
 authRoute.post("/login", loginValidation, AuthController.Login);
@@ -47,4 +48,29 @@ authRoute.put(
   PassResetValidation,
   AuthController.ResetPassword
 );
+
+authRoute.post(
+  "/google",
+  passport.authenticate("google", {
+    session: false,
+    scope: ["profile", "email"],
+    accessType: "offline",
+    approvalPrompt: "force",
+  })
+);
+
+// callback url upon successful google authentication
+authRoute.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/",
+    failureFlash: true,
+    successFlash: "Successfully logged in!",
+  }),
+  (req, res) => {
+    console.log("LOGGED IN");
+    return res.status(200).json({ msg: "Signed in successfully" });
+  }
+);
+authRoute.post("/google/login", AuthController.GoogleAuth);
 export default authRoute;

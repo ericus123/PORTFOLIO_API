@@ -102,9 +102,13 @@ class PostController {
         }
       }
 
-      const all = await Post.find().sort({ createdAt: -1 }).exec();
+      const all = await Post.find()
+        .populate(["author"])
+        .sort({ createdAt: -1 })
+        .exec();
       results.maxPages = Math.ceil(all.length / limit);
       results.results = await Post.find()
+        .populate(["author"])
         .sort({ createdAt: -1 })
         .limit(limit)
         .skip(startIndex)
@@ -123,9 +127,9 @@ class PostController {
   }
 
   static async getPost(req, res) {
-    const id = req.params.id;
+    const slug = req.params.slug;
     try {
-      const singlepost = await Post.findById(id).populate([
+      const singlepost = await Post.find({ slug }).populate([
         "category",
         {
           path: "comments",

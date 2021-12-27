@@ -1,22 +1,17 @@
 import { Router } from "express";
 import { messageValidation } from "../../middleware/validation";
-import verify from "../../middleware/AuthMiddleware";
-
-import {
-  messagesController,
-  deletemsgController,
-  getmessagesController,
-} from "../../controller/queries/messages";
+import messagesController from "../../controller/queries/messages";
+import AuthMiddleware from "../../middleware/AuthMiddleware";
 
 const messageRoute = new Router();
 //create messages
-messageRoute.post("/", messageValidation, messagesController);
+messageRoute.post("/", messageValidation, messagesController.sendMessage);
 
 //Get messages form db
 
-messageRoute.get("/", verify, getmessagesController);
+messageRoute.get("/", AuthMiddleware.checkToken, AuthMiddleware.checkSuperAdmin, messagesController.getMessages);
 //Delete a message
 
-messageRoute.delete("/:id", verify, deletemsgController);
+messageRoute.delete("/:id",  AuthMiddleware.checkToken, AuthMiddleware.checkSuperAdmin, messagesController.deleteMessage);
 
 export default messageRoute;

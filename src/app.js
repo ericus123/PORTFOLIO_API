@@ -13,8 +13,13 @@ import messageRoute from "./routes/queries/messages";
 import homeRoute from "./routes/homepage/homepage";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+const GoogleStrategy = require("passport-google-oauth2").Strategy;
 import cors from "cors";
 import cloudinary from "cloudinary";
+import passport from "passport";
+const passportSetup = require("./config/passport-setup");
+import flash from "connect-flash";
+import session from "express-session";
 
 //express app
 
@@ -22,6 +27,15 @@ const app = express();
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
+app.use(flash());
+app.use(
+  session({
+    cookie: { maxAge: 60000 },
+    secret: "woot",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 //cloudinary
 
@@ -45,7 +59,8 @@ app.use(express.json());
 
 //CORS middleware
 var corsMiddleware = function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*"); //replace localhost with actual host
+  req.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Methods",
     "OPTIONS, GET, PUT, PATCH, POST, DELETE"
@@ -56,6 +71,8 @@ var corsMiddleware = function (req, res, next) {
 };
 
 app.use(corsMiddleware);
+app.use(cors({ origin: "*" }));
+app.use(passport.initialize());
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/roles", roleRoute);
@@ -68,6 +85,14 @@ app.use("/api/home", homeRoute);
 app.use("/api/messages", messageRoute);
 app.use("/", (req, res) => {
   res.status(200).json({ message: "Hello ! Welcome on our website " });
+});
+
+passport.serializeUser(function (user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function (user, done) {
+  done(null, user);
 });
 app.use((req, res, next) => {
   res.status(404).json({ error: "wrong route" });
