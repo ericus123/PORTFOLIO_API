@@ -31,7 +31,7 @@ postRoute.get(
   PostsMiddleware.postExist,
   PostController.getPostReactions
 );
-postRoute.get("/", PostController.getPosts);
+postRoute.get("/all/:status", PostController.getPosts);
 postRoute.get("/all", PostController.getPostsAll);
 postRoute.get("/categories", PostController.getPostCats);
 postRoute.post(

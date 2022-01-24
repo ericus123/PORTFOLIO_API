@@ -390,6 +390,11 @@ export const postValidation = (req, res, next) => {
       "string.empty": "Profile image is required",
       "any.required": "Profile image is required",
     }),
+    status: Joi.string().valid("pending","deleted","published").messages({
+      "string.base": "Post status must contain letters only ",
+      "string.empty": "Please fill in the post status",
+      "any.required": "Post status is required",
+    }),
   });
   const { error } = schema.validate(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });

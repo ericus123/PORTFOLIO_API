@@ -47,27 +47,25 @@ class PostController {
       const posts = await Post.find().populate([
         "category",
         {
-          path: "comments",
-          populate: {
-            path: "replies",
-          },
-        },
-        "likes",
-        "unLikes",
-        "category",
-        "author",
+          path:"author",
+          select:["avatar", "gender", "email", "fisrtName","lastName"]
+        }
       ]);
 
       return res
         .status(200)
         .json({ msg: "Posts retrieved successfuly", posts: posts });
     } catch (error) {
+      console.log(error.body, error.response)
       return res
         .status(500)
         .json({ err: error, error: "Something went wrong" });
     }
+ 
   }
   static async getPosts(req, res) {
+    const {status} = req.params;
+    console.log(req.params);
     try {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
@@ -102,17 +100,22 @@ class PostController {
         }
       }
 
-      const all = await Post.find()
-        .populate(["author"])
-        .sort({ createdAt: -1 })
+     
+     const all = await Post.find({status:status}).sort({ createdAt: -1 })
         .exec();
-      results.maxPages = Math.ceil(all.length / limit);
-      results.results = await Post.find()
-        .populate(["author"])
-        .sort({ createdAt: -1 })
-        .limit(limit)
-        .skip(startIndex)
-        .exec();
+      
+      if(all.length){
+        results.maxPages = Math.ceil(all.length / limit);
+        results.results = await Post.find()
+          .sort({ createdAt: -1 })
+          .limit(limit)
+          .skip(startIndex)
+          .exec()
+      }else{
+        results.results = [];
+      }
+         
+     
 
       return res.status(200).json({
         msg: "Posts fetched successfuly",
@@ -140,7 +143,10 @@ class PostController {
         },
         "likes",
         "category",
-        "author",
+        {
+          path:"author",
+          select:["avatar", "gender", "email", "fisrtName","lastName"]
+        }
       ]);
       res
         .status(200)
