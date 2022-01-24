@@ -12,6 +12,10 @@ const postSchema = new mongoose.Schema({
     max: 255,
     min: 6,
   },
+  status: {
+    type: String,
+    default: "pending"
+  },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

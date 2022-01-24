@@ -47,15 +47,9 @@ class PostController {
       const posts = await Post.find().populate([
         "category",
         {
-          path: "comments",
-          populate: {
-            path: "replies",
-          },
+          path: "author",
+          select: ["avatar", "gender", "email", "fisrtName", "lastName"],
         },
-        "likes",
-        "unLikes",
-        "category",
-        "author",
       ]);
 
       return res
@@ -68,6 +62,7 @@ class PostController {
     }
   }
   static async getPosts(req, res) {
+    const { status } = req.params;
     try {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
@@ -102,17 +97,20 @@ class PostController {
         }
       }
 
-      const all = await Post.find()
-        .populate(["author"])
+      const all = await Post.find({ status: status })
         .sort({ createdAt: -1 })
         .exec();
-      results.maxPages = Math.ceil(all.length / limit);
-      results.results = await Post.find()
-        .populate(["author"])
-        .sort({ createdAt: -1 })
-        .limit(limit)
-        .skip(startIndex)
-        .exec();
+
+      if (all.length) {
+        results.maxPages = Math.ceil(all.length / limit);
+        results.results = await Post.find({ status: status })
+          .sort({ createdAt: -1 })
+          .limit(limit)
+          .skip(startIndex)
+          .exec();
+      } else {
+        results.results = [];
+      }
 
       return res.status(200).json({
         msg: "Posts fetched successfuly",
@@ -140,7 +138,10 @@ class PostController {
         },
         "likes",
         "category",
-        "author",
+        {
+          path: "author",
+          select: ["avatar", "gender", "email", "fisrtName", "lastName"],
+        },
       ]);
       res
         .status(200)
@@ -211,7 +212,10 @@ class PostController {
           .status(400)
           .json({ error: "Can't fing what you are looking for :(" });
       }
-      const posts = await Post.find({ category: category._id });
+      const posts = await Post.find({
+        category: category._id,
+        status: "active",
+      });
       if (!posts) return res.status(400).json({ error: "No results found!" });
 
       if (endIndex < posts.length) {
@@ -629,7 +633,8 @@ class PostController {
             },
           },
         },
-      ]);
+      ]).then((res) => res.filter((post) => post.status === "active"));
+
       if (endIndex < posts.length) {
         results.next = {
           page: page + 1,
@@ -656,7 +661,9 @@ class PostController {
           };
         }
       }
-      results.results = posts.slice(startIndex, startIndex + limit);
+      results.results = posts
+        .slice(startIndex, startIndex + limit)
+        .filter((post) => post.status === "pending");
       return res.status(200).json({
         msg: "Search results retrieved successfuly",
         term: query,
@@ -664,6 +671,7 @@ class PostController {
         posts: posts,
       });
     } catch (error) {
+      console.log(error);
       return res.status(400).json({ error: "Error occurred", err: error });
     }
   }
