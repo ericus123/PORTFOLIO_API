@@ -51,13 +51,18 @@ const userSchema = new mongoose.Schema({
     default: "basic",
     enum: ["basic", "admin", "superAdmin"],
   },
+  status: {
+    type: String,
+    default: "active",
+    enum: ["active", "deleted"],
+  },
   avatar: {
     type: String,
     default: null,
   },
   avatar_public_id: {
     type: String,
-    default: null
+    default: null,
   },
   posts: [
     {

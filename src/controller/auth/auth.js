@@ -313,7 +313,6 @@ class AuthController {
   }
 
   static GoogleAuth = async (req, res) => {
-    console.log(req.body);
     const { email, familyName, givenName } = req.body;
 
     const login = await User.findOne({ email });

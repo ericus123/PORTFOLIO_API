@@ -16,12 +16,10 @@ class AuthMiddleware {
   }
   static async checkAccessToken(req, res, next) {
     const token = req.params.token;
-    console.log(token);
     if (!token) return res.status(401).json({ error: "Unauthorized request" });
     try {
       const verified = jwt.verify(token, process.env.TOKEN_SECRET);
       req.token = verified;
-
 
       next();
     } catch (err) {
@@ -62,7 +60,6 @@ class AuthMiddleware {
       req.user = user;
       next();
     } catch (error) {
-
       return res
         .status(400)
         .json({ error: "Something went wrong", err: error });
@@ -109,9 +106,8 @@ class AuthMiddleware {
   }
   static async checkEmail(req, res, next) {
     try {
-      const email = req.body.email ? req.body.email : req.params.email;
+      const email = req.body.email || req.params.email;
       const { valid } = validate(email);
-      console.log(valid)
       if (!valid) {
         return res.status(400).json({ error: "Email is invalid" });
       }
