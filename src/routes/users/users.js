@@ -1,6 +1,8 @@
 import { Router } from "express";
 import UserController from "../../controller/users/users";
 import AuthMiddleware from "../../middleware/AuthMiddleware";
+import { emailValidation } from "../../middleware/validation";
+import User from "../../model/User";
 
 const userRoute = new Router();
 userRoute.get(
@@ -15,17 +17,20 @@ userRoute.get(
   AuthMiddleware.checkSuperAdmin,
   UserController.getUser
 );
+
 userRoute.delete(
-  "/",
+  "/user/delete",
   AuthMiddleware.checkToken,
   AuthMiddleware.checkSuperAdmin,
-  UserController.deleteAllUsers
+  emailValidation,
+  UserController.deleteUser
 );
 userRoute.delete(
-  "/user",
+  "/user/activate",
   AuthMiddleware.checkToken,
   AuthMiddleware.checkSuperAdmin,
-  UserController.deleteUser
+  emailValidation,
+  UserController.activateUser
 );
 
 export default userRoute;
