@@ -18,14 +18,14 @@ userRoute.get(
   UserController.getUser
 );
 
-userRoute.delete(
+userRoute.patch(
   "/user/delete",
   AuthMiddleware.checkToken,
   AuthMiddleware.checkSuperAdmin,
   emailValidation,
   UserController.deleteUser
 );
-userRoute.delete(
+userRoute.patch(
   "/user/activate",
   AuthMiddleware.checkToken,
   AuthMiddleware.checkSuperAdmin,

@@ -20,7 +20,7 @@ class UserRoles {
       }
       user.role = role;
       await user.save();
-      const assigner = `${user.firstName} ${user.lastName}`;
+      const assigner = `${req.user.firstName} ${req.user.lastName}`;
       const assignee = user.firstName;
       const power = role.charAt(0).toUpperCase() + role.slice(1);
 
