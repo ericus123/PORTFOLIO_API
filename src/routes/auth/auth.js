@@ -68,7 +68,6 @@ authRoute.get(
     successFlash: "Successfully logged in!",
   }),
   (req, res) => {
-    console.log("LOGGED IN");
     return res.status(200).json({ msg: "Signed in successfully" });
   }
 );
