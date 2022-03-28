@@ -140,7 +140,7 @@ class PostController {
         "category",
         {
           path: "author",
-          select: ["avatar", "gender", "email", "fisrtName", "lastName"],
+          select: ["avatar", "gender", "email", "firstName", "lastName","bio",],
         },
       ]);
       res

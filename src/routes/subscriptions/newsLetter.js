@@ -24,5 +24,9 @@ newsLetterRoute.get(
   AuthMiddleware.checkAdmin,
   NewsLetterController.getSubscriber
 );
-newsLetterRoute.post("/unsubscribe/:email", NewsLetterController.unsubscribe);
+newsLetterRoute.post(
+  "/unsubscribe/:email",
+  NewsLetterMiddleware.checkEmail,
+  NewsLetterController.unsubscribe
+);
 export default newsLetterRoute;

@@ -25,12 +25,15 @@ class NewsLetterController {
       const { email } = req.params;
       const subscribed = await NewsLetter.findOne({ email: email });
       if (!subscribed) {
-        return res.status(400).json({ error: "You've not subscribed" });
+        return res
+          .status(400)
+          .json({ error: "You are not a newsletter subscriber" });
       }
       await NewsLetter.deleteOne(subscribed);
-      return res
-        .status(201)
-        .json({ msg: "Unsubscribed successfuly", unsubscriber: subscribed });
+      return res.status(201).json({
+        msg: "Unsubscribed successfuly. You will not receive newsletter updates to your email",
+        unsubscriber: subscribed,
+      });
     } catch (error) {
       return res.status(400).json({ error: "Something went wrong, try again" });
     }
