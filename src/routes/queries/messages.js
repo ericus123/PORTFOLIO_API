@@ -2,10 +2,11 @@ import { Router } from "express";
 import { messageValidation } from "../../middleware/validation";
 import messagesController from "../../controller/queries/messages";
 import AuthMiddleware from "../../middleware/AuthMiddleware";
+import NewsLetterMiddleware from "../../middleware/subscriptions/newsLetter";
 
 const messageRoute = new Router();
 //create messages
-messageRoute.post("/", messageValidation, messagesController.sendMessage);
+messageRoute.post("/", messageValidation, NewsLetterMiddleware.checkEmail, messagesController.sendMessage);
 
 //Get messages form db
 
